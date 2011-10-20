@@ -21,8 +21,8 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 
-import pl.psnc.dl.wf4ever.Constants;
-import pl.psnc.dl.wf4ever.RdfBuilder;
+import pl.psnc.dl.wf4ever.dlibra.utils.Constants;
+import pl.psnc.dl.wf4ever.dlibra.utils.RdfBuilder;
 import pl.psnc.dlibra.common.Id;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;

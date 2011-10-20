@@ -33,13 +33,13 @@ import pl.psnc.dlibra.user.UserServer;
 public class UsersHelper
 {
 
-	private DLibraDataSource dLibra;
+	private final DLibraDataSource dLibra;
 
-	private DirectoryManager directoryManager;
+	private final DirectoryManager directoryManager;
 
-	private UserServiceResolver serviceResolver;
+	private final UserServiceResolver serviceResolver;
 
-	private UserManager userManager;
+	private final UserManager userManager;
 
 
 	public UsersHelper(DLibraDataSource dLibraDataSource)
@@ -164,16 +164,6 @@ public class UsersHelper
 		catch (IdNotFoundException e) {
 			return false;
 		}
-	}
-
-
-	public boolean isAdmin(String login)
-		throws RemoteException, IdNotFoundException, DLibraException
-	{
-		User userData = userManager.getUserData(login);
-
-		//TODO make it independent of the username
-		return userData.getName().equals("wfadmin");
 	}
 
 }

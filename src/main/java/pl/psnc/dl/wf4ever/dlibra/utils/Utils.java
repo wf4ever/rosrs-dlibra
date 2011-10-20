@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever;
+package pl.psnc.dl.wf4ever.dlibra.utils;
 
 import java.rmi.RemoteException;
 
