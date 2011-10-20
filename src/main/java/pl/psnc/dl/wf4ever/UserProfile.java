@@ -12,6 +12,8 @@ public class UserProfile
 
 	private final String login;
 
+	private final String password;
+
 	private final String name;
 
 	private final boolean admin;
@@ -21,10 +23,11 @@ public class UserProfile
 	 * @param login
 	 * @param name
 	 */
-	public UserProfile(String login, String name, boolean admin)
+	public UserProfile(String login, String password, String name, boolean admin)
 	{
 		super();
 		this.login = login;
+		this.password = password;
 		this.name = name;
 		this.admin = admin;
 	}
@@ -33,6 +36,15 @@ public class UserProfile
 	public String getLogin()
 	{
 		return login;
+	}
+
+
+	/**
+	 * @return the password
+	 */
+	public String getPassword()
+	{
+		return password;
 	}
 
 
@@ -46,4 +58,5 @@ public class UserProfile
 	{
 		return admin;
 	}
+
 }

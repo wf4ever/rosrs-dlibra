@@ -62,6 +62,8 @@ public class DLibraDataSource
 
 	private final String userLogin;
 
+	private final String userPassword;
+
 	private final ContentServer contentServer;
 
 	private final UserManager userManager;
@@ -100,6 +102,7 @@ public class DLibraDataSource
 				authorizationToken);
 
 		this.userLogin = userLogin;
+		this.userPassword = password;
 		this.workspacesContainerDirectoryId = new DirectoryId(
 				workspacesContainerDirectoryId);
 		this.collectionId = new LibCollectionId(collectionId);
@@ -223,7 +226,7 @@ public class DLibraDataSource
 		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
-		return new UserProfile(userLogin, user.getName(),
+		return new UserProfile(userLogin, userPassword, user.getName(),
 				userLogin.equals("wfadmin"));
 	}
 
