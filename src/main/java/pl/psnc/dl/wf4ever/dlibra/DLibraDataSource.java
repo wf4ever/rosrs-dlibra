@@ -220,10 +220,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		return new UserProfile(userLogin, user.getName(),
@@ -244,10 +241,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		return getResourcePaths(workspaceId, researchObjectId, versionId,
@@ -268,10 +262,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -290,10 +281,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		return getFileMetadata(workspaceId, researchObjectId, versionId,
@@ -313,13 +301,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (TransformerException e) {
+		catch (RemoteException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -338,10 +320,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		return getZippedFolder(workspaceId, researchObjectId, versionId,
@@ -362,10 +341,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -384,10 +360,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		return getFileContents(workspaceId, researchObjectId, versionId,
@@ -408,10 +381,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -430,10 +400,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		return getFileMimeType(workspaceId, researchObjectId, versionId,
@@ -453,10 +420,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -475,13 +439,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (IOException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (TransformerException e) {
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -499,13 +457,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (IOException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (TransformerException e) {
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -523,10 +475,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		List<String> ids = new ArrayList<String>();
@@ -550,10 +499,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		List<String> ids = new ArrayList<String>();
@@ -575,10 +521,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -597,10 +540,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		List<String> ids = new ArrayList<String>();
@@ -623,16 +563,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (IOException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (TransformerException e) {
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -650,16 +581,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (IOException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (TransformerException e) {
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -675,10 +597,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -692,16 +611,10 @@ public class DLibraDataSource
 		try {
 			getUsersHelper().createUser(userId, password);
 		}
-		catch (IdNotFoundException e) {
+		catch (IdNotFoundException | DuplicatedValueException e) {
 			throw e;
 		}
-		catch (DuplicatedValueException e) {
-			throw e;
-		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -717,10 +630,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -736,10 +646,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -757,10 +664,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -779,10 +683,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		return getManifest(workspaceId, researchObjectId, versionId,
@@ -801,13 +702,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (IOException e) {
+		catch (IOException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -826,10 +721,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		return getZippedVersion(workspaceId, researchObjectId, versionId,
@@ -849,10 +741,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -870,10 +759,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -891,10 +777,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -913,16 +796,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (IOException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (TransformerException e) {
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -940,10 +814,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -961,16 +832,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (IOException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (TransformerException e) {
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -988,10 +850,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		List<String> ids = new ArrayList<String>();
@@ -1012,10 +871,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
@@ -1031,10 +887,7 @@ public class DLibraDataSource
 		catch (IdNotFoundException e) {
 			throw e;
 		}
-		catch (RemoteException e) {
-			throw new DigitalLibraryException(e.getMessage());
-		}
-		catch (DLibraException e) {
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
