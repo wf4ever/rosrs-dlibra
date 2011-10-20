@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever;
+package pl.psnc.dl.wf4ever.dlibra;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -11,7 +11,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import pl.psnc.dl.wf4ever.dlibra.IncorrectManifestException;
+import pl.psnc.dl.wf4ever.dlibra.helpers.IncorrectManifestException;
 import pl.psnc.dlibra.metadata.Edition;
 import pl.psnc.dlibra.metadata.EditionId;
 import pl.psnc.dlibra.service.DuplicatedValueException;

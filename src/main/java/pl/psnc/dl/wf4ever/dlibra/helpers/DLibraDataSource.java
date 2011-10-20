@@ -1,4 +1,4 @@
-package pl.psnc.dl.wf4ever.dlibra;
+package pl.psnc.dl.wf4ever.dlibra.helpers;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,9 +17,9 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 
-import pl.psnc.dl.wf4ever.DigitalLibrary;
-import pl.psnc.dl.wf4ever.DigitalLibraryException;
-import pl.psnc.dl.wf4ever.UserProfile;
+import pl.psnc.dl.wf4ever.dlibra.DigitalLibrary;
+import pl.psnc.dl.wf4ever.dlibra.DigitalLibraryException;
+import pl.psnc.dl.wf4ever.dlibra.UserProfile;
 import pl.psnc.dlibra.content.ContentServer;
 import pl.psnc.dlibra.metadata.AbstractPublicationInfo;
 import pl.psnc.dlibra.metadata.DirectoryId;

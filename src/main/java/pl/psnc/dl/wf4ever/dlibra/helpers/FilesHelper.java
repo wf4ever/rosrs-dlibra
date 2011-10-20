@@ -1,4 +1,4 @@
-package pl.psnc.dl.wf4ever.dlibra;
+package pl.psnc.dl.wf4ever.dlibra.helpers;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
