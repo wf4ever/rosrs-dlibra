@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 
+import pl.psnc.dl.wf4ever.dlibra.ResourceInfo;
 import pl.psnc.dl.wf4ever.dlibra.utils.Constants;
 import pl.psnc.dl.wf4ever.dlibra.utils.RdfBuilder;
 import pl.psnc.dlibra.common.Id;
@@ -313,19 +314,20 @@ public class FilesHelper
 	}
 
 
-	public void createOrUpdateFile(URI versionUri, String groupPublicationName,
-			String publicationName, String filePath, InputStream inputStream,
-			String mimeType)
+	public ResourceInfo createOrUpdateFile(URI versionUri,
+			String groupPublicationName, String publicationName,
+			String filePath, InputStream inputStream, String mimeType)
 		throws IOException, DLibraException, TransformerException
 	{
-		createOrUpdateFile(versionUri, groupPublicationName, publicationName,
-			filePath, inputStream, mimeType, true);
+		return createOrUpdateFile(versionUri, groupPublicationName,
+			publicationName, filePath, inputStream, mimeType, true);
 	}
 
 
-	public void createOrUpdateFile(URI versionUri, String groupPublicationName,
-			String publicationName, String filePath, InputStream inputStream,
-			String mimeType, boolean generateManifest)
+	public ResourceInfo createOrUpdateFile(URI versionUri,
+			String groupPublicationName, String publicationName,
+			String filePath, InputStream inputStream, String mimeType,
+			boolean generateManifest)
 		throws IOException, DLibraException, TransformerException
 	{
 		PublicationId publicationId = dLibra.getPublicationsHelper()
@@ -358,6 +360,15 @@ public class FilesHelper
 
 		deleteUnnecessaryEmptyFolders(versionUri, groupPublicationName,
 			publicationName, filePath);
+
+		String name = filePath.substring(filePath.lastIndexOf('/'));
+		byte[] fileDigest = contentServer.getFileDigest(createdVersionId);
+		String digest = getHex(fileDigest);
+		VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(
+			new InputFilter(versionId), new OutputFilter(VersionInfo.class))
+				.getResultInfo();
+		long size = versionInfo.getSize();
+		return new ResourceInfo(name, digest, size);
 	}
 
 

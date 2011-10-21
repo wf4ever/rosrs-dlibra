@@ -81,7 +81,7 @@ public interface DigitalLibrary
 		throws DigitalLibraryException, IdNotFoundException;
 
 
-	public void createOrUpdateFile(URI versionUri, String workspaceId,
+	public ResourceInfo createOrUpdateFile(URI versionUri, String workspaceId,
 			String researchObjectId, String versionId, String filePath,
 			InputStream inputStream, String type)
 		throws DigitalLibraryException, IdNotFoundException;

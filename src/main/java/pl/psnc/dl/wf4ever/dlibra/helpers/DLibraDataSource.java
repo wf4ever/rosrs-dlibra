@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import pl.psnc.dl.wf4ever.dlibra.DigitalLibrary;
 import pl.psnc.dl.wf4ever.dlibra.DigitalLibraryException;
+import pl.psnc.dl.wf4ever.dlibra.ResourceInfo;
 import pl.psnc.dl.wf4ever.dlibra.UserProfile;
 import pl.psnc.dlibra.content.ContentServer;
 import pl.psnc.dlibra.metadata.AbstractPublicationInfo;
@@ -430,14 +431,14 @@ public class DLibraDataSource
 
 
 	@Override
-	public void createOrUpdateFile(URI versionUri, String workspaceId,
+	public ResourceInfo createOrUpdateFile(URI versionUri, String workspaceId,
 			String researchObjectId, String versionId, String filePath,
 			InputStream inputStream, String type)
 		throws DigitalLibraryException, IdNotFoundException
 	{
 		try {
-			getFilesHelper().createOrUpdateFile(versionUri, researchObjectId,
-				versionId, filePath, inputStream, type);
+			return getFilesHelper().createOrUpdateFile(versionUri,
+				researchObjectId, versionId, filePath, inputStream, type);
 		}
 		catch (IdNotFoundException e) {
 			throw e;
