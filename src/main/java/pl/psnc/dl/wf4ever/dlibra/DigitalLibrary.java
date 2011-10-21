@@ -39,11 +39,13 @@ public interface DigitalLibrary
 		throws DigitalLibraryException, IdNotFoundException;
 
 
+	@Deprecated
 	public String getFileMetadata(String workspaceId, String researchObjectId,
 			String versionId, String filePath, URI baseURI)
 		throws DigitalLibraryException, IdNotFoundException;
 
 
+	@Deprecated
 	public String getFileMetadata(String workspaceId, String researchObjectId,
 			String versionId, String filePath, long editionId, URI baseURI)
 		throws DigitalLibraryException, IdNotFoundException;
@@ -142,11 +144,13 @@ public interface DigitalLibrary
 		throws DigitalLibraryException, IdNotFoundException;
 
 
+	@Deprecated
 	public InputStream getManifest(String workspaceId, String researchObjectId,
 			String versionId)
 		throws DigitalLibraryException, IdNotFoundException;
 
 
+	@Deprecated
 	public InputStream getManifest(String workspaceId, String researchObjectId,
 			String versionId, long editionId)
 		throws DigitalLibraryException, IdNotFoundException;
@@ -172,6 +176,7 @@ public interface DigitalLibrary
 		throws DigitalLibraryException, IdNotFoundException;
 
 
+	@Deprecated
 	public void updateManifest(URI versionUri, String researchObjectId,
 			String versionId, ByteArrayInputStream body)
 		throws DigitalLibraryException, IncorrectManifestException,
