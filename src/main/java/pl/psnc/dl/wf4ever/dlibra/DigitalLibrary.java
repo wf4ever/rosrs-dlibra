@@ -7,9 +7,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import javax.ws.rs.core.MultivaluedMap;
 
 import pl.psnc.dl.wf4ever.dlibra.helpers.IncorrectManifestException;
 import pl.psnc.dlibra.metadata.Edition;
@@ -99,7 +98,7 @@ public interface DigitalLibrary
 
 
 	public List<String> getVersionIds(String workspaceId,
-			MultivaluedMap<String, String> queryParameters)
+			Map<String, List<String>> queryParameters)
 		throws DigitalLibraryException, IdNotFoundException;
 
 

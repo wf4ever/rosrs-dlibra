@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
@@ -151,7 +150,7 @@ public class PublicationsHelper
 	 * @throws DLibraException
 	 */
 	public List<AbstractPublicationInfo> listUserPublications(
-			MultivaluedMap<String, String> queryParameters)
+			Map<String, List<String>> queryParameters)
 		throws RemoteException, DLibraException
 	{
 		SearchServer searchServer = dLibra.getSearchServer();

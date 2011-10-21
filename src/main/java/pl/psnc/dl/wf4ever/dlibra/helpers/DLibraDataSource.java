@@ -10,9 +10,9 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
@@ -492,7 +492,7 @@ public class DLibraDataSource
 
 	@Override
 	public List<String> getVersionIds(String workspaceId,
-			MultivaluedMap<String, String> queryParameters)
+			Map<String, List<String>> queryParameters)
 		throws DigitalLibraryException, IdNotFoundException
 	{
 		List<AbstractPublicationInfo> infos;

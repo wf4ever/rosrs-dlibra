@@ -85,11 +85,5 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-server</artifactId>
-			<version>1.4</version>
-			<scope>compile</scope>
-		</dependency>
 	</dependencies>
 </project>
