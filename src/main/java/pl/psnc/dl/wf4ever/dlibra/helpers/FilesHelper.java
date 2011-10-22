@@ -361,7 +361,7 @@ public class FilesHelper
 		deleteUnnecessaryEmptyFolders(versionUri, groupPublicationName,
 			publicationName, filePath);
 
-		String name = filePath.substring(filePath.lastIndexOf('/'));
+		String name = filePath.substring(filePath.lastIndexOf('/') + 1);
 		byte[] fileDigest = contentServer.getFileDigest(createdVersionId);
 		String digest = getHex(fileDigest);
 		VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(

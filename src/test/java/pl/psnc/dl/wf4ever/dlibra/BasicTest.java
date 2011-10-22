@@ -80,8 +80,10 @@ public class BasicTest
 				workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
 		dl.createWorkspace("w");
 		dl.createResearchObject("w", "r");
-		dl.createVersion("w", "r", "v", URI.create("workspaces/w/ros/r/v"));
+		dl.createVersion("w", "r", "v", URI.create("http://example.com/workspaces/w/ros/r/v"));
 		dl.deleteWorkspace("w");
-		dl.deleteUser(USER_ID);
+		dlA = new DLibraDataSource(host, port,
+				workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
+		dlA.deleteUser(USER_ID);
 	}
 }
