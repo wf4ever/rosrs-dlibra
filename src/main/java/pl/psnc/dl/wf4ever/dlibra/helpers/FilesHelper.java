@@ -352,6 +352,7 @@ public class FilesHelper
 			publicationManager.removeEditionVersion(editionId, versionId);
 		}
 		publicationManager.addEditionVersion(editionId, createdVersionId);
+		versionId = getVersionIdSafe(editionId, filePath);
 
 		if (generateManifest) {
 			dLibra.getManifestHelper().regerenerateManifestSafe(versionUri,
