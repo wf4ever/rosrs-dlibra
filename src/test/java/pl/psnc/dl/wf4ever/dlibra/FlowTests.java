@@ -49,8 +49,10 @@ public class FlowTests {
 	private static final String w = "w";
 	private static final String r = "r";
 	private static final String v = "v";
+	private static final String v2 = "v2";
 
 	private static final URI versionURI = URI.create("http://example.com/workspaces/w/ros/r/v");
+	private static final URI versionURI2 = URI.create("http://example.com/workspaces/w/ros/r/v2");
 
 	/**
 	 * @throws java.lang.Exception
@@ -102,36 +104,61 @@ public class FlowTests {
 
 	@Test
 	public final void testAddingResources() throws IdNotFoundException, DigitalLibraryException, IOException {
-		InputStream file1 = files[0].open();
-		ResourceInfo r1 = dl.createOrUpdateFile(versionURI, w, r, v, files[0].path, file1, files[0].mimeType);
-		file1.close();
-		assertNotNull(r1);
+		createOrUpdateFile(files[0]);
+		createOrUpdateFile(files[1]);
+		getZippedVersion();
+		getFileContent(files[0]);
+		getFileContent(files[1]);
+		getZippedFolder(files[1]);
+		createOrUpdateFile(files[0]);
+		createOrUpdateFile(files[1]);
+		createVersionAsCopy();
+		deleteFile(files[0]);
+		deleteFile(files[1]);
+		checkNoFile(files[0]);
+		checkNoFile(files[1]);
+	}
 
-		InputStream file2 = files[1].open();
-		ResourceInfo r2 = dl.createOrUpdateFile(versionURI, w, r, v, files[1].path, file2, files[1].mimeType);
-		file2.close();
-		assertNotNull(r2);
+	private void checkNoFile(FileRecord file) throws DigitalLibraryException, IdNotFoundException {
+		try {
+			dl.deleteFile(versionURI, w, r, v, file.path);
+			fail("Deleted file doesn't throw IdNotFoundException");
+		} catch (IdNotFoundException e) {
+			// good
+		}
+	}
 
+	private void deleteFile(FileRecord file) throws DigitalLibraryException, IdNotFoundException {
+		dl.deleteFile(versionURI, w, r, v, file.path);
+	}
+
+	private void createVersionAsCopy() throws DigitalLibraryException, IdNotFoundException {
+		dl.createVersion(w, r, v2, versionURI2);
+	}
+
+	private void getZippedFolder(FileRecord file) throws DigitalLibraryException, IdNotFoundException, IOException {
+		InputStream zip = dl.getZippedFolder(w, r, v, file.dir);
+		assertNotNull(zip);
+		zip.close();
+	}
+
+	private void getFileContent(FileRecord file) throws DigitalLibraryException, IdNotFoundException, IOException {
+		InputStream f = dl.getFileContents(w, r, v, file.path);
+		assertNotNull(f);
+		f.close();
+		assertEquals(files[0].mimeType, dl.getFileMimeType(w, r, v, file.path));
+	}
+
+	private void getZippedVersion() throws DigitalLibraryException, IdNotFoundException {
 		InputStream zip1 = dl.getZippedVersion(w, r, v);
 		assertNotNull(zip1);
+	}
 
-		InputStream f1 = dl.getFileContents(w, r, v, files[0].path);
-		assertNotNull(f1);
-		f1.close();
-		assertEquals(files[0].mimeType, dl.getFileMimeType(w, r, v, files[0].path));
-
-		InputStream f2 = dl.getFileContents(w, r, v, files[0].path);
-		assertNotNull(f2);
-		f2.close();
-		assertEquals(files[1].mimeType, dl.getFileMimeType(w, r, v, files[1].path));
-
-		InputStream dir1 = dl.getFileContents(w, r, v, files[1].dir);
-		assertNotNull(dir1);
-		dir1.close();
-
-		InputStream zip2 = dl.getZippedFolder(w, r, v, files[1].dir);
-		assertNotNull(zip2);
-		zip2.close();
+	private void createOrUpdateFile(FileRecord file) throws DigitalLibraryException, IdNotFoundException, IOException {
+		InputStream f = files[0].open();
+		ResourceInfo r1 = dl.createOrUpdateFile(versionURI, w, r, v, file.path, f, file.mimeType);
+		f.close();
+		assertNotNull(r1);
 	}
 
 	private class FileRecord {
