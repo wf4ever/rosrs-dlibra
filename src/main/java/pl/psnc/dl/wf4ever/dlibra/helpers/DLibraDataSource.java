@@ -807,12 +807,12 @@ public class DLibraDataSource
 
 
 	@Override
-	public EditionId createEdition(String workspaceId, String versionName,
+	public EditionId createEdition(String workspaceId, String editionName,
 			String researchObjectId, String versionId)
 		throws DigitalLibraryException, IdNotFoundException
 	{
 		try {
-			return getEditionHelper().createEdition(versionName,
+			return getEditionHelper().createEdition(editionName,
 				researchObjectId, versionId);
 		}
 		catch (IdNotFoundException e) {
