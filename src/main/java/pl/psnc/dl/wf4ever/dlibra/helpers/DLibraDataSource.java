@@ -383,11 +383,9 @@ public class DLibraDataSource implements DigitalLibrary {
 	}
 
 	@Override
-	public boolean userExists(String userId) throws DigitalLibraryException, NotFoundException {
+	public boolean userExists(String userId) throws DigitalLibraryException {
 		try {
 			return getUsersHelper().userExists(userId);
-		} catch (IdNotFoundException e) {
-			throw new NotFoundException(e);
 		} catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}

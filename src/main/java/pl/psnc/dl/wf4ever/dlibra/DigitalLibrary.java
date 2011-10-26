@@ -65,7 +65,7 @@ public interface DigitalLibrary {
 	public void createUser(String userId, String password) throws DigitalLibraryException, NotFoundException,
 			ConflictException;
 
-	public boolean userExists(String userId) throws DigitalLibraryException, NotFoundException;
+	public boolean userExists(String userId) throws DigitalLibraryException;
 
 	public void deleteUser(String userId) throws DigitalLibraryException, NotFoundException;
 
