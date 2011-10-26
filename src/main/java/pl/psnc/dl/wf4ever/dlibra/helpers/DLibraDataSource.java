@@ -140,7 +140,7 @@ public class DLibraDataSource implements DigitalLibrary {
 		return collectionId;
 	}
 
-	public EditionHelper getEditionHelper() {
+	EditionHelper getEditionHelper() {
 		return editionHelper;
 	}
 
