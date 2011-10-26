@@ -23,8 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
-import pl.psnc.dlibra.metadata.Edition;
-import pl.psnc.dlibra.service.IdNotFoundException;
 
 /**
  * @author piotrek
@@ -109,7 +107,7 @@ public class FlowTests {
 	}
 
 	@Test
-	public final void testAddingResources() throws IdNotFoundException, DigitalLibraryException, IOException {
+	public final void testAddingResources() throws DigitalLibraryException, IOException, NotFoundException {
 		createOrUpdateFile(files[0]);
 		createOrUpdateFile(files[1]);
 		getZippedVersion();
@@ -126,7 +124,7 @@ public class FlowTests {
 	}
 
 	@Test
-	public final void testEmptyDirectory() throws IdNotFoundException, DigitalLibraryException, IOException {
+	public final void testEmptyDirectory() throws  DigitalLibraryException, IOException, NotFoundException {
 		createOrUpdateDirectory(directories[1]);
 		getZippedFolder(directories[1]);
 		createOrUpdateFile(files[1]);
@@ -137,7 +135,7 @@ public class FlowTests {
 	}
 
 	@Test
-	public final void testEditions() throws IdNotFoundException, DigitalLibraryException, IOException {
+	public final void testEditions() throws DigitalLibraryException, IOException, NotFoundException {
 		long edId1 = createEdition();
 		createOrUpdateFile(files[0]);
 		createOrUpdateFile(files[1]);
@@ -163,18 +161,18 @@ public class FlowTests {
 		checkNoEditionPublished();
 	}
 
-	private void unpublishEdition() throws IdNotFoundException, DigitalLibraryException {
+	private void unpublishEdition() throws DigitalLibraryException, NotFoundException {
 		dl.unpublishVersion(w, r, v);
 	}
 
-	private void publishEdition() throws IdNotFoundException, DigitalLibraryException {
+	private void publishEdition() throws DigitalLibraryException, NotFoundException {
 		dl.publishVersion(w, r, v);
 	}
 
-	private void checkPublished(long edId) throws IdNotFoundException, DigitalLibraryException {
-		Set<Edition> eds = dl.getEditionList(w, r, v);
-		for (Edition ed : eds) {
-			if (ed.getId().getId() == edId) {
+	private void checkPublished(long edId) throws DigitalLibraryException, NotFoundException {
+		Set<Snapshot> eds = dl.getEditionList(w, r, v);
+		for (Snapshot ed : eds) {
+			if (ed.getId() == edId) {
 				assertTrue("Edition should be published", ed.isPublished());
 			} else {
 				assertFalse("No edition should be published", ed.isPublished());
@@ -182,77 +180,77 @@ public class FlowTests {
 		}
 	}
 
-	private void checkNoEditionPublished() throws IdNotFoundException, DigitalLibraryException {
-		Set<Edition> eds = dl.getEditionList(w, r, v);
-		for (Edition ed : eds) {
+	private void checkNoEditionPublished() throws DigitalLibraryException, NotFoundException {
+		Set<Snapshot> eds = dl.getEditionList(w, r, v);
+		for (Snapshot ed : eds) {
 			assertFalse("No edition should be published", ed.isPublished());
 		}
 	}
 
-	private long createEdition() throws IdNotFoundException, DigitalLibraryException {
+	private long createEdition() throws DigitalLibraryException, NotFoundException {
 		return dl.createEdition(w, v, r, v).getId();
 	}
 
-	private void checkNoFile(String path) throws DigitalLibraryException, IdNotFoundException {
+	private void checkNoFile(String path) throws DigitalLibraryException {
 		try {
 			dl.getFileContents(w, r, v, path);
 			fail("Deleted file doesn't throw IdNotFoundException");
-		} catch (IdNotFoundException e) {
+		} catch (NotFoundException e) {
 			// good
 		}
 	}
 
-	private void checkNoFile(String path, long edId) throws DigitalLibraryException, IdNotFoundException {
+	private void checkNoFile(String path, long edId) throws DigitalLibraryException {
 		try {
 			dl.getFileContents(w, r, v, path, edId);
 			fail("Deleted file doesn't throw IdNotFoundException");
-		} catch (IdNotFoundException e) {
+		} catch (NotFoundException e) {
 			// good
 		}
 	}
 
-	private void deleteFile(String path) throws DigitalLibraryException, IdNotFoundException {
+	private void deleteFile(String path) throws DigitalLibraryException, NotFoundException {
 		dl.deleteFile(w, r, v, path);
 	}
 
-	private void createVersionAsCopy() throws DigitalLibraryException, IdNotFoundException {
+	private void createVersionAsCopy() throws DigitalLibraryException, NotFoundException {
 		dl.createVersion(w, r, v2);
 	}
 
-	private void getZippedFolder(String path) throws DigitalLibraryException, IdNotFoundException, IOException {
+	private void getZippedFolder(String path) throws DigitalLibraryException, IOException, NotFoundException {
 		InputStream zip = dl.getZippedFolder(w, r, v, path);
 		assertNotNull(zip);
 		zip.close();
 	}
 
-	private void getFileContent(FileRecord file, long edId) throws IdNotFoundException, DigitalLibraryException,
-			IOException {
+	private void getFileContent(FileRecord file, long edId) throws DigitalLibraryException,
+			IOException, NotFoundException {
 		InputStream f = dl.getFileContents(w, r, v, file.path, edId);
 		assertNotNull(f);
 		f.close();
 		assertEquals(file.mimeType, dl.getFileMimeType(w, r, v, file.path, edId));
 	}
 
-	private void getFileContent(FileRecord file) throws DigitalLibraryException, IdNotFoundException, IOException {
+	private void getFileContent(FileRecord file) throws DigitalLibraryException, IOException, NotFoundException {
 		InputStream f = dl.getFileContents(w, r, v, file.path);
 		assertNotNull(f);
 		f.close();
 		assertEquals(file.mimeType, dl.getFileMimeType(w, r, v, file.path));
 	}
 
-	private void getZippedVersion() throws DigitalLibraryException, IdNotFoundException {
+	private void getZippedVersion() throws DigitalLibraryException, NotFoundException {
 		InputStream zip1 = dl.getZippedVersion(w, r, v);
 		assertNotNull(zip1);
 	}
 
-	private void createOrUpdateFile(FileRecord file) throws DigitalLibraryException, IdNotFoundException, IOException {
+	private void createOrUpdateFile(FileRecord file) throws DigitalLibraryException, IOException, NotFoundException {
 		InputStream f = file.open();
 		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, file.path, f, file.mimeType);
 		f.close();
 		assertNotNull(r1);
 	}
 
-	private void createOrUpdateDirectory(String path) throws DigitalLibraryException, IdNotFoundException, IOException {
+	private void createOrUpdateDirectory(String path) throws DigitalLibraryException, IOException, NotFoundException {
 		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, path, new ByteArrayInputStream(new byte[0]),
 				"text/plain");
 		assertNotNull(r1);

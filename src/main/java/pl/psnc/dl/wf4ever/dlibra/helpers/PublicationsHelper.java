@@ -300,13 +300,11 @@ public class PublicationsHelper {
 						(byte) (Publication.PUB_GROUP_ROOT | Publication.PUB_GROUP_MID)).setState(
 						(byte) (Publication.PUB_STATE_ALL - Publication.PUB_STATE_PERMANENT_DELETED)),
 				new OutputFilter(ElementInfo.class, List.class)).getResultInfos();
-		logger.debug(resultInfos);
 		for (Info info : resultInfos) {
 			if (info instanceof GroupPublicationInfo && info.getLabel().equals(groupPublicationName)) {
 				return (PublicationId) info.getId();
 			}
 		}
-		logger.error("nothing found");
 		throw new IdNotFoundException(groupPublicationName);
 	}
 

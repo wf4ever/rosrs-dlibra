@@ -7,97 +7,92 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import pl.psnc.dlibra.metadata.Edition;
-import pl.psnc.dlibra.metadata.EditionId;
-import pl.psnc.dlibra.service.DuplicatedValueException;
-import pl.psnc.dlibra.service.IdNotFoundException;
-
 /**
  * @author piotrhol
  * 
  */
 public interface DigitalLibrary {
 
-	public UserProfile getUserProfile() throws DigitalLibraryException, IdNotFoundException;
+	public UserProfile getUserProfile() throws DigitalLibraryException, NotFoundException;
 
 	public List<String> getResourcePaths(String workspaceId, String researchObjectId, String versionId, String folder)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
 	public List<String> getResourcePaths(String workspaceId, String researchObjectId, String versionId, String folder,
-			long editionId) throws DigitalLibraryException, IdNotFoundException;
+			long editionId) throws DigitalLibraryException, NotFoundException;
 
 	public InputStream getZippedFolder(String workspaceId, String researchObjectId, String versionId, String folder)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
 	public InputStream getZippedFolder(String workspaceId, String researchObjectId, String versionId, String folder,
-			long editionId) throws DigitalLibraryException, IdNotFoundException;
+			long editionId) throws DigitalLibraryException, NotFoundException;
 
 	public InputStream getFileContents(String workspaceId, String researchObjectId, String versionId, String filePath)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
 	public InputStream getFileContents(String workspaceId, String researchObjectId, String versionId, String filePath,
-			long editionId) throws DigitalLibraryException, IdNotFoundException;
+			long editionId) throws DigitalLibraryException, NotFoundException;
 
 	public String getFileMimeType(String workspaceId, String researchObjectId, String versionId, String filePath)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
 	public String getFileMimeType(String workspaceId, String researchObjectId, String versionId, String filePath,
-			long editionId) throws DigitalLibraryException, IdNotFoundException;
+			long editionId) throws DigitalLibraryException, NotFoundException;
 
-	public ResourceInfo createOrUpdateFile(String workspaceId, String researchObjectId,
-			String versionId, String filePath, InputStream inputStream, String type) throws DigitalLibraryException,
-			IdNotFoundException;
+	public ResourceInfo createOrUpdateFile(String workspaceId, String researchObjectId, String versionId,
+			String filePath, InputStream inputStream, String type) throws DigitalLibraryException, NotFoundException;
 
-	public void deleteFile(String workspaceId, String researchObjectId, String versionId,
-			String filePath) throws DigitalLibraryException, IdNotFoundException;
+	public void deleteFile(String workspaceId, String researchObjectId, String versionId, String filePath)
+			throws DigitalLibraryException, NotFoundException;
 
-	public List<String> getResearchObjectIds(String workspaceId) throws DigitalLibraryException, IdNotFoundException;
+	public List<String> getResearchObjectIds(String workspaceId) throws DigitalLibraryException, NotFoundException;
 
 	public void createResearchObject(String workspaceId, String researchObjectId) throws DigitalLibraryException,
-			IdNotFoundException;
+			NotFoundException;
 
 	public List<String> getVersionIds(String workspaceId, String researchObjectId) throws DigitalLibraryException,
-			IdNotFoundException;
+			NotFoundException;
 
 	public void createVersion(String workspaceId, String researchObjectId, String version)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
-	public void createVersion(String workspaceId, String researchObjectId, String version, String baseVersion) throws DigitalLibraryException, IdNotFoundException;
+	public void createVersion(String workspaceId, String researchObjectId, String version, String baseVersion)
+			throws DigitalLibraryException, NotFoundException;
 
 	public void deleteResearchObject(String workspaceId, String researchObjectId) throws DigitalLibraryException,
-			IdNotFoundException;
+			NotFoundException;
 
-	public void createUser(String userId, String password) throws DigitalLibraryException, IdNotFoundException,
-			DuplicatedValueException;
+	public void createUser(String userId, String password) throws DigitalLibraryException, NotFoundException,
+			ConflictException;
 
-	public boolean userExists(String userId) throws DigitalLibraryException, IdNotFoundException;
+	public boolean userExists(String userId) throws DigitalLibraryException, NotFoundException;
 
-	public void deleteUser(String userId) throws DigitalLibraryException, IdNotFoundException;
+	public void deleteUser(String userId) throws DigitalLibraryException, NotFoundException;
 
-	public Set<Edition> getEditionList(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, IdNotFoundException;
+	public Set<Snapshot> getEditionList(String workspaceId, String researchObjectId, String versionId)
+			throws DigitalLibraryException, NotFoundException;
 
 	public InputStream getZippedVersion(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
 	public InputStream getZippedVersion(String workspaceId, String researchObjectId, String versionId, long editionId)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
 	public void publishVersion(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
 	public void unpublishVersion(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
-	public EditionId createEdition(String workspaceId, String versionName, String researchObjectId, String versionId)
-			throws DigitalLibraryException, IdNotFoundException;
+	public Snapshot createEdition(String workspaceId, String versionName, String researchObjectId, String versionId)
+			throws DigitalLibraryException, NotFoundException;
 
 	public void deleteVersion(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, IdNotFoundException;
+			throws DigitalLibraryException, NotFoundException;
 
-	public List<String> getWorkspaceIds() throws DigitalLibraryException, IdNotFoundException;
+	public List<String> getWorkspaceIds() throws DigitalLibraryException, NotFoundException;
 
-	public void createWorkspace(String workspaceId) throws DigitalLibraryException, IdNotFoundException;
+	public void createWorkspace(String workspaceId) throws DigitalLibraryException, NotFoundException;
 
-	public void deleteWorkspace(String workspaceId) throws DigitalLibraryException, IdNotFoundException;
+	public void deleteWorkspace(String workspaceId) throws DigitalLibraryException, NotFoundException;
 }

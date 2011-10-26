@@ -66,11 +66,13 @@ public class BasicTest
 	 * @throws MalformedURLException 
 	 * @throws RemoteException 
 	 * @throws DigitalLibraryException 
+	 * @throws ConflictException 
+	 * @throws NotFoundException 
 	 */
 	@Test
 	public final void testCreateVersionStringStringStringURI()
 		throws RemoteException, MalformedURLException, UnknownHostException,
-		DLibraException, DigitalLibraryException
+		DLibraException, DigitalLibraryException, NotFoundException, ConflictException
 	{
 		DLibraDataSource dlA = new DLibraDataSource(host, port,
 				workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
