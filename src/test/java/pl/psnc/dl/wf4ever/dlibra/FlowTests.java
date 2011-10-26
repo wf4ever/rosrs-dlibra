@@ -41,7 +41,7 @@ public class FlowTests {
 
 	private static final String ADMIN_PASSWORD = "wfadmin!!!";
 
-	private static final String USER_ID = "test-" + new Date().getTime();
+	private String userId;
 
 	private static final String USER_PASSWORD = "password";
 
@@ -85,9 +85,10 @@ public class FlowTests {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		userId = "test-" + new Date().getTime();
 		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
-		dl.createUser(USER_ID, USER_PASSWORD);
-		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
+		dl.createUser(userId, USER_PASSWORD);
+		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
 		dl.createWorkspace("w");
 		dl.createResearchObject("w", "r");
 		dl.createVersion("w", "r", "v", versionURI);
@@ -104,7 +105,7 @@ public class FlowTests {
 	public void tearDown() throws Exception {
 		dl.deleteWorkspace("w");
 		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
-		dl.deleteUser(USER_ID);
+		dl.deleteUser(userId);
 	}
 
 	@Test
@@ -114,7 +115,7 @@ public class FlowTests {
 		getZippedVersion();
 		getFileContent(files[0]);
 		getFileContent(files[1]);
-		getZippedFolder(files[1].path);
+		getZippedFolder(directories[1]);
 		createOrUpdateFile(files[0]);
 		createOrUpdateFile(files[1]);
 		createVersionAsCopy();
@@ -150,8 +151,11 @@ public class FlowTests {
 		getFileContent(files[2]);
 		checkNoFile(files[0].path);
 		getFileContent(files[0], edId1);
-		getFileContent(files[2], edId1);
-		checkNoFile(files[0].path, edId1);
+		getFileContent(files[1], edId1);
+		checkNoFile(files[2].path, edId1);
+		getFileContent(files[1], edId2);
+		getFileContent(files[2], edId2);
+		checkNoFile(files[0].path, edId2);
 		checkPublished(edId1);
 		publishEdition();
 		checkPublished(edId2);
@@ -226,14 +230,14 @@ public class FlowTests {
 		InputStream f = dl.getFileContents(w, r, v, file.path, edId);
 		assertNotNull(f);
 		f.close();
-		assertEquals(files[0].mimeType, dl.getFileMimeType(w, r, v, file.path));
+		assertEquals(file.mimeType, dl.getFileMimeType(w, r, v, file.path, edId));
 	}
 
 	private void getFileContent(FileRecord file) throws DigitalLibraryException, IdNotFoundException, IOException {
 		InputStream f = dl.getFileContents(w, r, v, file.path);
 		assertNotNull(f);
 		f.close();
-		assertEquals(files[0].mimeType, dl.getFileMimeType(w, r, v, file.path));
+		assertEquals(file.mimeType, dl.getFileMimeType(w, r, v, file.path));
 	}
 
 	private void getZippedVersion() throws DigitalLibraryException, IdNotFoundException {
@@ -242,7 +246,7 @@ public class FlowTests {
 	}
 
 	private void createOrUpdateFile(FileRecord file) throws DigitalLibraryException, IdNotFoundException, IOException {
-		InputStream f = files[0].open();
+		InputStream f = file.open();
 		ResourceInfo r1 = dl.createOrUpdateFile(versionURI, w, r, v, file.path, f, file.mimeType);
 		f.close();
 		assertNotNull(r1);
