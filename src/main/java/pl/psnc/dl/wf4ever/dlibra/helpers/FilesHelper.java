@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +21,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 
 import pl.psnc.dl.wf4ever.dlibra.ResourceInfo;
-import pl.psnc.dl.wf4ever.dlibra.utils.Constants;
 import pl.psnc.dlibra.common.Id;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -88,7 +86,7 @@ public class FilesHelper {
 	public List<String> getFilePathsInFolder(EditionId editionId, String folder) throws RemoteException,
 			DLibraException {
 		ArrayList<String> result = new ArrayList<String>();
-		for (FileInfo fileInfo : getFilesInFolder(editionId, folder, false).values()) {
+		for (FileInfo fileInfo : getFilesInFolder(editionId, folder).values()) {
 			if (EmptyFoldersUtility.isDlibraPath(fileInfo.getFullPath())) {
 				result.add(EmptyFoldersUtility.convertDlibra2Real(fileInfo.getFullPath()));
 			} else {
@@ -107,7 +105,7 @@ public class FilesHelper {
 	 * @throws RemoteException
 	 * @throws DLibraException
 	 */
-	private Map<VersionId, FileInfo> getFilesInFolder(EditionId editionId, String folder, boolean includeManifest)
+	private Map<VersionId, FileInfo> getFilesInFolder(EditionId editionId, String folder)
 			throws RemoteException, DLibraException {
 		Map<VersionId, FileInfo> result = new HashMap<VersionId, FileInfo>();
 		if (folder != null && !folder.endsWith("/"))
@@ -128,10 +126,8 @@ public class FilesHelper {
 				result.clear();
 				return result;
 			}
-			if (includeManifest || !filePath.equals("/" + Constants.MANIFEST_FILENAME)) {
-				if (folder == null || filePath.startsWith("/" + folder)) {
-					result.put(versionId, fileInfo);
-				}
+			if (folder == null || filePath.startsWith("/" + folder)) {
+				result.put(versionId, fileInfo);
 			}
 		}
 
@@ -156,7 +152,7 @@ public class FilesHelper {
 			DLibraException {
 		final String folder = (folderNotStandardized == null ? null
 				: (folderNotStandardized.endsWith("/") ? folderNotStandardized : folderNotStandardized.concat("/")));
-		final Map<VersionId, FileInfo> fileVersionsAndInfos = getFilesInFolder(editionId, folder, true);
+		final Map<VersionId, FileInfo> fileVersionsAndInfos = getFilesInFolder(editionId, folder);
 
 		PipedInputStream in = new PipedInputStream();
 		final PipedOutputStream out;
@@ -237,9 +233,9 @@ public class FilesHelper {
 		return hex.toString();
 	}
 
-	public ResourceInfo createOrUpdateFile(URI versionUri, String groupPublicationName, String publicationName,
-			String filePath, InputStream inputStream, String mimeType) throws IOException,
-			DLibraException, TransformerException {
+	public ResourceInfo createOrUpdateFile(String groupPublicationName, String publicationName,
+			String filePath, InputStream inputStream, String mimeType) throws IOException, DLibraException,
+			TransformerException {
 		PublicationId publicationId = dLibra.getPublicationsHelper().getPublicationId(groupPublicationName,
 				publicationName);
 		EditionId editionId = dLibra.getEditionHelper().getLastEditionId(publicationId);
@@ -261,7 +257,7 @@ public class FilesHelper {
 		publicationManager.addEditionVersion(editionId, createdVersionId);
 		versionId = getVersionIdSafe(editionId, filePath);
 
-		deleteUnnecessaryEmptyFolders(versionUri, groupPublicationName, publicationName, filePath);
+		deleteUnnecessaryEmptyFolders(groupPublicationName, publicationName, filePath);
 
 		String name = filePath.substring(filePath.lastIndexOf('/') + 1);
 		byte[] fileDigest = contentServer.getFileDigest(createdVersionId);
@@ -273,7 +269,6 @@ public class FilesHelper {
 	}
 
 	/**
-	 * @param versionUri
 	 * @param groupPublicationName
 	 * @param publicationName
 	 * @param filePath
@@ -281,13 +276,13 @@ public class FilesHelper {
 	 * @throws IOException
 	 * @throws TransformerException
 	 */
-	private void deleteUnnecessaryEmptyFolders(URI versionUri, String groupPublicationName, String publicationName,
+	private void deleteUnnecessaryEmptyFolders(String groupPublicationName, String publicationName,
 			String filePath) throws DLibraException, IOException, TransformerException {
 		String intermediateFilePath = filePath;
 		while (intermediateFilePath.lastIndexOf("/") > 0) {
 			intermediateFilePath = intermediateFilePath.substring(0, intermediateFilePath.lastIndexOf("/"));
 			try {
-				deleteFile(versionUri, groupPublicationName, publicationName,
+				deleteFile(groupPublicationName, publicationName,
 						EmptyFoldersUtility.convertReal2Dlibra(intermediateFilePath));
 			} catch (IdNotFoundException ex) {
 				// ok, this folder was not empty
@@ -351,7 +346,7 @@ public class FilesHelper {
 		}
 	}
 
-	public void deleteFile(URI versionUri, String groupPublicationName, String publicationName, String filePath)
+	public void deleteFile(String groupPublicationName, String publicationName, String filePath)
 			throws DLibraException, IOException, TransformerException {
 		PublicationId publicationId = dLibra.getPublicationsHelper().getPublicationId(groupPublicationName,
 				publicationName);
@@ -395,7 +390,7 @@ public class FilesHelper {
 		}
 
 		if (recreateEmptyFolder) {
-			createOrUpdateFile(versionUri, groupPublicationName, publicationName, emptyFolder,
+			createOrUpdateFile(groupPublicationName, publicationName, emptyFolder,
 					new ByteArrayInputStream(new byte[] {}), "text/plain");
 		}
 

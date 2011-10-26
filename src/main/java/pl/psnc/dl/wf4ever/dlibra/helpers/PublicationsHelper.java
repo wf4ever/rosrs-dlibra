@@ -5,7 +5,6 @@ package pl.psnc.dl.wf4ever.dlibra.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +17,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 
-import pl.psnc.dl.wf4ever.dlibra.utils.Constants;
 import pl.psnc.dlibra.common.Info;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -190,14 +188,11 @@ public class PublicationsHelper {
 	 * @param publicationName
 	 * @param basePublicationName
 	 *            Optional name of base publication to copy from
-	 * @param versionURI
-	 *            URI of the new RO version, used for creating manifest
 	 * @throws DLibraException
 	 * @throws IOException
 	 * @throws TransformerException
 	 */
-	public void createPublication(String groupPublicationName, String publicationName, String basePublicationName,
-			URI versionURI) throws DLibraException, IOException, TransformerException {
+	public void createPublication(String groupPublicationName, String publicationName, String basePublicationName) throws DLibraException, IOException, TransformerException {
 		PublicationId groupId = getGroupId(groupPublicationName);
 		try {
 			getPublicationId(groupId, publicationName);
@@ -212,10 +207,10 @@ public class PublicationsHelper {
 		logger.debug(String.format("Created publication %s with id %s", publication.getName(), publicationId));
 		if (basePublicationName != null && !basePublicationName.isEmpty()) {
 			PublicationId basePublicationId = getPublicationId(groupId, basePublicationName);
-			preparePublicationAsACopy(groupPublicationName, publicationName, versionURI, publicationId,
+			preparePublicationAsACopy(groupPublicationName, publicationName, publicationId,
 					basePublicationName, basePublicationId);
 		} else {
-			preparePublicationAsNew(groupPublicationName, publicationName, versionURI, publicationId);
+			preparePublicationAsNew(groupPublicationName, publicationName, publicationId);
 		}
 
 		dLibra.getMetadataServer()
@@ -256,12 +251,11 @@ public class PublicationsHelper {
 		return publication;
 	}
 
-	private EditionId preparePublicationAsNew(String groupPublicationName, String publicationName, URI versionUri,
-			PublicationId publicationId) throws DLibraException, AccessDeniedException, IdNotFoundException,
+	private EditionId preparePublicationAsNew(String groupPublicationName, String publicationName, PublicationId publicationId) throws DLibraException, AccessDeniedException, IdNotFoundException,
 			RemoteException, TransformerException, IOException {
 		Date creationDate = new Date();
 
-		File file = new File("application/rdf+xml", publicationId, "/" + Constants.MANIFEST_FILENAME);
+		File file = new File("text/plain", publicationId, "/mainfilestub");
 
 		Version createdVersion = fileManager.createVersion(file, 0, creationDate, "");
 
@@ -275,8 +269,7 @@ public class PublicationsHelper {
 		return editionId;
 	}
 
-	private void preparePublicationAsACopy(String groupPublicationName, String publicationName, URI versionURI,
-			PublicationId publicationId, String basePublicationName, PublicationId basePublicationId)
+	private void preparePublicationAsACopy(String groupPublicationName, String publicationName, PublicationId publicationId, String basePublicationName, PublicationId basePublicationId)
 			throws RemoteException, DLibraException, AccessDeniedException, IdNotFoundException, IOException,
 			TransformerException {
 		VersionId[] copyVersions = dLibra.getFilesHelper().copyVersions(basePublicationId, publicationId);
@@ -290,13 +283,11 @@ public class PublicationsHelper {
 	 * 
 	 * @param groupPublicationName
 	 * @param publicationName
-	 * @param versionUri
-	 *            URI of this RO version, used for modifying manifest
 	 * @throws DLibraException
 	 * @throws IOException
 	 * @throws TransformerException
 	 */
-	public void deletePublication(String groupPublicationName, String publicationName, URI versionUri)
+	public void deletePublication(String groupPublicationName, String publicationName)
 			throws DLibraException, IOException, TransformerException {
 		PublicationId publicationId = getPublicationId(getGroupId(groupPublicationName), publicationName);
 

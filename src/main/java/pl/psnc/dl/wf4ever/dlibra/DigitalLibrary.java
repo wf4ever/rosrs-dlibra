@@ -4,7 +4,6 @@
 package pl.psnc.dl.wf4ever.dlibra;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -45,11 +44,11 @@ public interface DigitalLibrary {
 	public String getFileMimeType(String workspaceId, String researchObjectId, String versionId, String filePath,
 			long editionId) throws DigitalLibraryException, IdNotFoundException;
 
-	public ResourceInfo createOrUpdateFile(URI versionUri, String workspaceId, String researchObjectId,
+	public ResourceInfo createOrUpdateFile(String workspaceId, String researchObjectId,
 			String versionId, String filePath, InputStream inputStream, String type) throws DigitalLibraryException,
 			IdNotFoundException;
 
-	public void deleteFile(URI versionUri, String workspaceId, String researchObjectId, String versionId,
+	public void deleteFile(String workspaceId, String researchObjectId, String versionId,
 			String filePath) throws DigitalLibraryException, IdNotFoundException;
 
 	public List<String> getResearchObjectIds(String workspaceId) throws DigitalLibraryException, IdNotFoundException;
@@ -60,11 +59,10 @@ public interface DigitalLibrary {
 	public List<String> getVersionIds(String workspaceId, String researchObjectId) throws DigitalLibraryException,
 			IdNotFoundException;
 
-	public void createVersion(String workspaceId, String researchObjectId, String version, URI resourceUri)
+	public void createVersion(String workspaceId, String researchObjectId, String version)
 			throws DigitalLibraryException, IdNotFoundException;
 
-	public void createVersion(String workspaceId, String researchObjectId, String version, String baseVersion,
-			URI resourceUri) throws DigitalLibraryException, IdNotFoundException;
+	public void createVersion(String workspaceId, String researchObjectId, String version, String baseVersion) throws DigitalLibraryException, IdNotFoundException;
 
 	public void deleteResearchObject(String workspaceId, String researchObjectId) throws DigitalLibraryException,
 			IdNotFoundException;
@@ -94,7 +92,7 @@ public interface DigitalLibrary {
 	public EditionId createEdition(String workspaceId, String versionName, String researchObjectId, String versionId)
 			throws DigitalLibraryException, IdNotFoundException;
 
-	public void deleteVersion(String workspaceId, String researchObjectId, String versionId, URI versionURI)
+	public void deleteVersion(String workspaceId, String researchObjectId, String versionId)
 			throws DigitalLibraryException, IdNotFoundException;
 
 	public List<String> getWorkspaceIds() throws DigitalLibraryException, IdNotFoundException;

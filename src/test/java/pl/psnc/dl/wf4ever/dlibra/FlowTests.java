@@ -3,12 +3,15 @@
  */
 package pl.psnc.dl.wf4ever.dlibra;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
@@ -56,9 +59,6 @@ public class FlowTests {
 	private static final String v = "v";
 	private static final String v2 = "v2";
 
-	private static final URI versionURI = URI.create("http://example.com/workspaces/w/ros/r/v");
-	private static final URI versionURI2 = URI.create("http://example.com/workspaces/w/ros/r/v2");
-
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -91,7 +91,7 @@ public class FlowTests {
 		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
 		dl.createWorkspace("w");
 		dl.createResearchObject("w", "r");
-		dl.createVersion("w", "r", "v", versionURI);
+		dl.createVersion("w", "r", "v");
 
 		files[0] = new FileRecord("file1.txt", "file1.txt", "text/plain");
 		files[1] = new FileRecord("file2.txt", "dir/file2.txt", "text/plain");
@@ -212,11 +212,11 @@ public class FlowTests {
 	}
 
 	private void deleteFile(String path) throws DigitalLibraryException, IdNotFoundException {
-		dl.deleteFile(versionURI, w, r, v, path);
+		dl.deleteFile(w, r, v, path);
 	}
 
 	private void createVersionAsCopy() throws DigitalLibraryException, IdNotFoundException {
-		dl.createVersion(w, r, v2, versionURI2);
+		dl.createVersion(w, r, v2);
 	}
 
 	private void getZippedFolder(String path) throws DigitalLibraryException, IdNotFoundException, IOException {
@@ -247,13 +247,13 @@ public class FlowTests {
 
 	private void createOrUpdateFile(FileRecord file) throws DigitalLibraryException, IdNotFoundException, IOException {
 		InputStream f = file.open();
-		ResourceInfo r1 = dl.createOrUpdateFile(versionURI, w, r, v, file.path, f, file.mimeType);
+		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, file.path, f, file.mimeType);
 		f.close();
 		assertNotNull(r1);
 	}
 
 	private void createOrUpdateDirectory(String path) throws DigitalLibraryException, IdNotFoundException, IOException {
-		ResourceInfo r1 = dl.createOrUpdateFile(versionURI, w, r, v, path, new ByteArrayInputStream(new byte[0]),
+		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, path, new ByteArrayInputStream(new byte[0]),
 				"text/plain");
 		assertNotNull(r1);
 	}

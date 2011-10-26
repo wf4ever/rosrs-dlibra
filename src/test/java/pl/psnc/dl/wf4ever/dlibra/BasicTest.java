@@ -5,7 +5,6 @@ package pl.psnc.dl.wf4ever.dlibra;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.Date;
@@ -80,7 +79,7 @@ public class BasicTest
 				workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
 		dl.createWorkspace("w");
 		dl.createResearchObject("w", "r");
-		dl.createVersion("w", "r", "v", URI.create("http://example.com/workspaces/w/ros/r/v"));
+		dl.createVersion("w", "r", "v");
 		dl.deleteWorkspace("w");
 		dlA = new DLibraDataSource(host, port,
 				workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);

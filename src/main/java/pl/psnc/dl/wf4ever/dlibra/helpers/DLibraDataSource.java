@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -263,11 +262,11 @@ public class DLibraDataSource implements DigitalLibrary {
 	}
 
 	@Override
-	public ResourceInfo createOrUpdateFile(URI versionUri, String workspaceId, String researchObjectId,
+	public ResourceInfo createOrUpdateFile(String workspaceId, String researchObjectId,
 			String versionId, String filePath, InputStream inputStream, String type) throws DigitalLibraryException,
 			IdNotFoundException {
 		try {
-			return getFilesHelper().createOrUpdateFile(versionUri, researchObjectId, versionId, filePath, inputStream,
+			return getFilesHelper().createOrUpdateFile(researchObjectId, versionId, filePath, inputStream,
 					type);
 		} catch (IdNotFoundException e) {
 			throw e;
@@ -277,10 +276,10 @@ public class DLibraDataSource implements DigitalLibrary {
 	}
 
 	@Override
-	public void deleteFile(URI versionUri, String workspaceId, String researchObjectId, String versionId,
+	public void deleteFile(String workspaceId, String researchObjectId, String versionId,
 			String filePath) throws DigitalLibraryException, IdNotFoundException {
 		try {
-			getFilesHelper().deleteFile(versionUri, researchObjectId, versionId, filePath);
+			getFilesHelper().deleteFile(researchObjectId, versionId, filePath);
 		} catch (IdNotFoundException e) {
 			throw e;
 		} catch (IOException | DLibraException | TransformerException e) {
@@ -336,10 +335,10 @@ public class DLibraDataSource implements DigitalLibrary {
 	}
 
 	@Override
-	public void createVersion(String workspaceId, String researchObjectId, String version, URI resourceUri)
+	public void createVersion(String workspaceId, String researchObjectId, String version)
 			throws DigitalLibraryException, IdNotFoundException {
 		try {
-			getPublicationsHelper().createPublication(researchObjectId, version, null, resourceUri);
+			getPublicationsHelper().createPublication(researchObjectId, version, null);
 		} catch (IdNotFoundException e) {
 			throw e;
 		} catch (IOException | DLibraException | TransformerException e) {
@@ -348,10 +347,9 @@ public class DLibraDataSource implements DigitalLibrary {
 	}
 
 	@Override
-	public void createVersion(String workspaceId, String researchObjectId, String version, String baseVersion,
-			URI resourceUri) throws DigitalLibraryException, IdNotFoundException {
+	public void createVersion(String workspaceId, String researchObjectId, String version, String baseVersion) throws DigitalLibraryException, IdNotFoundException {
 		try {
-			getPublicationsHelper().createPublication(researchObjectId, version, baseVersion, resourceUri);
+			getPublicationsHelper().createPublication(researchObjectId, version, baseVersion);
 		} catch (IdNotFoundException e) {
 			throw e;
 		} catch (IOException | DLibraException | TransformerException e) {
@@ -480,10 +478,10 @@ public class DLibraDataSource implements DigitalLibrary {
 	}
 
 	@Override
-	public void deleteVersion(String workspaceId, String researchObjectId, String versionId, URI versionURI)
+	public void deleteVersion(String workspaceId, String researchObjectId, String versionId)
 			throws DigitalLibraryException, IdNotFoundException {
 		try {
-			getPublicationsHelper().deletePublication(researchObjectId, versionId, versionURI);
+			getPublicationsHelper().deletePublication(researchObjectId, versionId);
 		} catch (IdNotFoundException e) {
 			throw e;
 		} catch (IOException | DLibraException | TransformerException e) {
