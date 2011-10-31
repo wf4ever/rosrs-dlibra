@@ -9,43 +9,52 @@ import java.util.Date;
  * @author piotrek
  *
  */
-public class Snapshot {
-	
-	private long id;
-	
-	private boolean published;
-	
-	private Date creationDate;
+public class Snapshot
+{
+
+	private final long id;
+
+	private final boolean published;
+
+	private final Date creationDate;
+
 
 	/**
 	 * @param id
 	 * @param published
 	 * @param creationDate
 	 */
-	public Snapshot(long id, boolean published, Date creationDate) {
+	public Snapshot(long id, boolean published, Date creationDate)
+	{
 		this.id = id;
 		this.published = published;
 		this.creationDate = creationDate;
 	}
 
+
 	/**
 	 * @return the id
 	 */
-	public long getId() {
+	public long getId()
+	{
 		return id;
 	}
+
 
 	/**
 	 * @return the published
 	 */
-	public boolean isPublished() {
+	public boolean isPublished()
+	{
 		return published;
 	}
+
 
 	/**
 	 * @return the creationDate
 	 */
-	public Date getCreationDate() {
+	public Date getCreationDate()
+	{
 		return creationDate;
 	}
 

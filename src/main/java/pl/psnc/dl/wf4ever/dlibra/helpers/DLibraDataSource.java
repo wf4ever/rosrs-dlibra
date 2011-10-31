@@ -47,10 +47,13 @@ import pl.psnc.dlibra.user.UserManager;
  * @author nowakm, piotrhol
  * 
  */
-public class DLibraDataSource implements DigitalLibrary {
+public class DLibraDataSource
+	implements DigitalLibrary
+{
 
 	@SuppressWarnings("unused")
-	private final static Logger logger = Logger.getLogger(DLibraDataSource.class);
+	private final static Logger logger = Logger
+			.getLogger(DLibraDataSource.class);
 
 	public static final DirectoryId ROOT_DIRECTORY_ID = new DirectoryId(1L);
 
@@ -80,23 +83,33 @@ public class DLibraDataSource implements DigitalLibrary {
 
 	private final LibCollectionId collectionId;
 
-	public DLibraDataSource(String host, int port, long workspacesContainerDirectoryId, long collectionId,
-			String userLogin, String password) throws RemoteException, DLibraException, MalformedURLException,
-			UnknownHostException {
-		AuthorizationToken authorizationToken = new AuthorizationToken(userLogin, password);
-		serviceResolver = new UserServiceResolver(new ServiceUrl(InetAddress.getByName(host),
-				UserInterface.SERVICE_TYPE, port), authorizationToken);
+
+	public DLibraDataSource(String host, int port,
+			long workspacesContainerDirectoryId, long collectionId,
+			String userLogin, String password)
+		throws RemoteException, DLibraException, MalformedURLException,
+		UnknownHostException
+	{
+		AuthorizationToken authorizationToken = new AuthorizationToken(
+				userLogin, password);
+		serviceResolver = new UserServiceResolver(new ServiceUrl(
+				InetAddress.getByName(host), UserInterface.SERVICE_TYPE, port),
+				authorizationToken);
 
 		this.userLogin = userLogin;
 		this.userPassword = password;
-		this.workspacesContainerDirectoryId = new DirectoryId(workspacesContainerDirectoryId);
+		this.workspacesContainerDirectoryId = new DirectoryId(
+				workspacesContainerDirectoryId);
 		this.collectionId = new LibCollectionId(collectionId);
 
-		metadataServer = DLStaticServiceResolver.getMetadataServer(serviceResolver, null);
+		metadataServer = DLStaticServiceResolver.getMetadataServer(
+			serviceResolver, null);
 
-		contentServer = DLStaticServiceResolver.getContentServer(serviceResolver, null);
+		contentServer = DLStaticServiceResolver.getContentServer(
+			serviceResolver, null);
 
-		userManager = DLStaticServiceResolver.getUserServer(serviceResolver, null).getUserManager();
+		userManager = DLStaticServiceResolver.getUserServer(serviceResolver,
+			null).getUserManager();
 
 		usersHelper = new UsersHelper(this);
 		publicationsHelper = new PublicationsHelper(this);
@@ -104,195 +117,296 @@ public class DLibraDataSource implements DigitalLibrary {
 		editionHelper = new EditionHelper(this);
 	}
 
-	UserServiceResolver getServiceResolver() {
+
+	UserServiceResolver getServiceResolver()
+	{
 		return serviceResolver;
 	}
 
-	ContentServer getContentServer() {
+
+	ContentServer getContentServer()
+	{
 		return contentServer;
 	}
 
-	UserManager getUserManager() {
+
+	UserManager getUserManager()
+	{
 		return userManager;
 	}
 
-	MetadataServer getMetadataServer() {
+
+	MetadataServer getMetadataServer()
+	{
 		return metadataServer;
 	}
 
-	UsersHelper getUsersHelper() {
+
+	UsersHelper getUsersHelper()
+	{
 		return usersHelper;
 	}
 
-	PublicationsHelper getPublicationsHelper() {
+
+	PublicationsHelper getPublicationsHelper()
+	{
 		return publicationsHelper;
 	}
 
-	FilesHelper getFilesHelper() {
+
+	FilesHelper getFilesHelper()
+	{
 		return filesHelper;
 	}
 
-	String getUserLogin() {
+
+	String getUserLogin()
+	{
 		return userLogin;
 	}
 
-	DirectoryId getWorkspacesContainerDirectoryId() {
+
+	DirectoryId getWorkspacesContainerDirectoryId()
+	{
 		return workspacesContainerDirectoryId;
 	}
 
-	LibCollectionId getCollectionId() {
+
+	LibCollectionId getCollectionId()
+	{
 		return collectionId;
 	}
 
-	EditionHelper getEditionHelper() {
+
+	EditionHelper getEditionHelper()
+	{
 		return editionHelper;
 	}
 
+
 	@Override
-	public UserProfile getUserProfile() throws DigitalLibraryException, NotFoundException {
+	public UserProfile getUserProfile()
+		throws DigitalLibraryException, NotFoundException
+	{
 		User user;
 		try {
 			user = userManager.getUserData(userLogin);
-		} catch (IdNotFoundException e) {
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
-		return new UserProfile(userLogin, userPassword, user.getName(), userLogin.equals("wfadmin"));
+		return new UserProfile(userLogin, userPassword, user.getName(),
+				userLogin.equals("wfadmin"));
 	}
 
+
 	@Override
-	public List<String> getResourcePaths(String workspaceId, String researchObjectId, String versionId, String folder)
-			throws DigitalLibraryException, NotFoundException {
+	public List<String> getResourcePaths(String workspaceId,
+			String researchObjectId, String versionId, String folder)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			EditionId editionId = getEditionHelper().getLastEditionId(researchObjectId, versionId);
-			return getResourcePaths(workspaceId, researchObjectId, versionId, folder, editionId.getId());
-		} catch (IdNotFoundException e) {
+			EditionId editionId = getEditionHelper().getLastEditionId(
+				researchObjectId, versionId);
+			return getResourcePaths(workspaceId, researchObjectId, versionId,
+				folder, editionId.getId());
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public List<String> getResourcePaths(String workspaceId, String researchObjectId, String versionId, String folder,
-			long editionId) throws DigitalLibraryException, NotFoundException {
+	public List<String> getResourcePaths(String workspaceId,
+			String researchObjectId, String versionId, String folder,
+			long editionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			return getFilesHelper().getFilePathsInFolder(new EditionId(editionId), folder);
-		} catch (IdNotFoundException e) {
+			return getFilesHelper().getFilePathsInFolder(
+				new EditionId(editionId), folder);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public InputStream getZippedFolder(String workspaceId, String researchObjectId, String versionId, String folder)
-			throws DigitalLibraryException, NotFoundException {
+	public InputStream getZippedFolder(String workspaceId,
+			String researchObjectId, String versionId, String folder)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			EditionId editionId = getEditionHelper().getLastEditionId(researchObjectId, versionId);
-			return getZippedFolder(workspaceId, researchObjectId, versionId, folder, editionId.getId());
-		} catch (IdNotFoundException e) {
+			EditionId editionId = getEditionHelper().getLastEditionId(
+				researchObjectId, versionId);
+			return getZippedFolder(workspaceId, researchObjectId, versionId,
+				folder, editionId.getId());
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public InputStream getZippedFolder(String workspaceId, String researchObjectId, String versionId, String folder,
-			long editionId) throws DigitalLibraryException, NotFoundException {
+	public InputStream getZippedFolder(String workspaceId,
+			String researchObjectId, String versionId, String folder,
+			long editionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			return getFilesHelper().getZippedFolder(new EditionId(editionId), folder);
-		} catch (IdNotFoundException e) {
+			return getFilesHelper().getZippedFolder(new EditionId(editionId),
+				folder);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public InputStream getFileContents(String workspaceId, String researchObjectId, String versionId, String filePath)
-			throws DigitalLibraryException, NotFoundException {
+	public InputStream getFileContents(String workspaceId,
+			String researchObjectId, String versionId, String filePath)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			EditionId editionId = getEditionHelper().getLastEditionId(researchObjectId, versionId);
-			return getFileContents(workspaceId, researchObjectId, versionId, filePath, editionId.getId());
-		} catch (IdNotFoundException e) {
+			EditionId editionId = getEditionHelper().getLastEditionId(
+				researchObjectId, versionId);
+			return getFileContents(workspaceId, researchObjectId, versionId,
+				filePath, editionId.getId());
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public InputStream getFileContents(String workspaceId, String researchObjectId, String versionId, String filePath,
-			long editionId) throws DigitalLibraryException, NotFoundException {
+	public InputStream getFileContents(String workspaceId,
+			String researchObjectId, String versionId, String filePath,
+			long editionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			return getFilesHelper().getFileContents(new EditionId(editionId), filePath);
-		} catch (IdNotFoundException e) {
+			return getFilesHelper().getFileContents(new EditionId(editionId),
+				filePath);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public String getFileMimeType(String workspaceId, String researchObjectId, String versionId, String filePath)
-			throws DigitalLibraryException, NotFoundException {
+	public String getFileMimeType(String workspaceId, String researchObjectId,
+			String versionId, String filePath)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			EditionId editionId = getEditionHelper().getLastEditionId(researchObjectId, versionId);
-			return getFileMimeType(workspaceId, researchObjectId, versionId, filePath, editionId.getId());
-		} catch (IdNotFoundException e) {
+			EditionId editionId = getEditionHelper().getLastEditionId(
+				researchObjectId, versionId);
+			return getFileMimeType(workspaceId, researchObjectId, versionId,
+				filePath, editionId.getId());
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public String getFileMimeType(String workspaceId, String researchObjectId, String versionId, String filePath,
-			long editionId) throws DigitalLibraryException, NotFoundException {
+	public String getFileMimeType(String workspaceId, String researchObjectId,
+			String versionId, String filePath, long editionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			return getFilesHelper().getFileMimeType(new EditionId(editionId), filePath);
-		} catch (IdNotFoundException e) {
+			return getFilesHelper().getFileMimeType(new EditionId(editionId),
+				filePath);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public ResourceInfo createOrUpdateFile(String workspaceId, String researchObjectId, String versionId,
-			String filePath, InputStream inputStream, String type) throws DigitalLibraryException, NotFoundException {
+	public ResourceInfo createOrUpdateFile(String workspaceId,
+			String researchObjectId, String versionId, String filePath,
+			InputStream inputStream, String type)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			return getFilesHelper().createOrUpdateFile(researchObjectId, versionId, filePath, inputStream, type);
-		} catch (IdNotFoundException e) {
+			return getFilesHelper().createOrUpdateFile(researchObjectId,
+				versionId, filePath, inputStream, type);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (IOException | DLibraException | TransformerException e) {
+		}
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void deleteFile(String workspaceId, String researchObjectId, String versionId, String filePath)
-			throws DigitalLibraryException, NotFoundException {
+	public void deleteFile(String workspaceId, String researchObjectId,
+			String versionId, String filePath)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
 			getFilesHelper().deleteFile(researchObjectId, versionId, filePath);
-		} catch (IdNotFoundException e) {
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (IOException | DLibraException | TransformerException e) {
+		}
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public List<String> getResearchObjectIds(String workspaceId) throws DigitalLibraryException, NotFoundException {
+	public List<String> getResearchObjectIds(String workspaceId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		List<AbstractPublicationInfo> infos;
 		try {
-			infos = getPublicationsHelper().listUserGroupPublications(Publication.PUB_GROUP_MID);
-		} catch (IdNotFoundException e) {
+			infos = getPublicationsHelper().listUserGroupPublications(
+				Publication.PUB_GROUP_MID);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		List<String> ids = new ArrayList<String>();
@@ -302,27 +416,38 @@ public class DLibraDataSource implements DigitalLibrary {
 		return ids;
 	}
 
+
 	@Override
-	public void createResearchObject(String workspaceId, String researchObjectId) throws DigitalLibraryException,
-			NotFoundException {
+	public void createResearchObject(String workspaceId, String researchObjectId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			getPublicationsHelper().createGroupPublication(workspaceId, researchObjectId);
-		} catch (IdNotFoundException e) {
+			getPublicationsHelper().createGroupPublication(workspaceId,
+				researchObjectId);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public List<String> getVersionIds(String workspaceId, String researchObjectId) throws DigitalLibraryException,
-			NotFoundException {
+	public List<String> getVersionIds(String workspaceId,
+			String researchObjectId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		List<PublicationInfo> infos;
 		try {
-			infos = getPublicationsHelper().listPublicationsInGroup(researchObjectId);
-		} catch (IdNotFoundException e) {
+			infos = getPublicationsHelper().listPublicationsInGroup(
+				researchObjectId);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		List<String> ids = new ArrayList<String>();
@@ -332,175 +457,254 @@ public class DLibraDataSource implements DigitalLibrary {
 		return ids;
 	}
 
+
 	@Override
-	public void createVersion(String workspaceId, String researchObjectId, String version)
-			throws DigitalLibraryException, NotFoundException {
+	public void createVersion(String workspaceId, String researchObjectId,
+			String version)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			getPublicationsHelper().createPublication(researchObjectId, version, null);
-		} catch (IdNotFoundException e) {
+			getPublicationsHelper().createPublication(researchObjectId,
+				version, null);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (IOException | DLibraException | TransformerException e) {
+		}
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void createVersion(String workspaceId, String researchObjectId, String version, String baseVersion)
-			throws DigitalLibraryException, NotFoundException {
+	public void createVersion(String workspaceId, String researchObjectId,
+			String version, String baseVersion)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			getPublicationsHelper().createPublication(researchObjectId, version, baseVersion);
-		} catch (IdNotFoundException e) {
+			getPublicationsHelper().createPublication(researchObjectId,
+				version, baseVersion);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (IOException | DLibraException | TransformerException e) {
+		}
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void deleteResearchObject(String workspaceId, String researchObjectId) throws DigitalLibraryException,
-			NotFoundException {
+	public void deleteResearchObject(String workspaceId, String researchObjectId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
 			getPublicationsHelper().deleteGroupPublication(researchObjectId);
-		} catch (IdNotFoundException e) {
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void createUser(String userId, String password) throws DigitalLibraryException, NotFoundException,
-			ConflictException {
+	public void createUser(String userId, String password)
+		throws DigitalLibraryException, NotFoundException, ConflictException
+	{
 		try {
 			getUsersHelper().createUser(userId, password);
-		} catch (IdNotFoundException e) {
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (DuplicatedValueException e) {
+		}
+		catch (DuplicatedValueException e) {
 			throw new ConflictException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public boolean userExists(String userId) throws DigitalLibraryException {
+	public boolean userExists(String userId)
+		throws DigitalLibraryException
+	{
 		try {
 			return getUsersHelper().userExists(userId);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void deleteUser(String userId) throws DigitalLibraryException, NotFoundException {
+	public void deleteUser(String userId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
 			getUsersHelper().deleteUser(userId);
-		} catch (IdNotFoundException e) {
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public Set<Snapshot> getEditionList(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, NotFoundException {
+	public Set<Snapshot> getEditionList(String workspaceId,
+			String researchObjectId, String versionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			Set<Edition> eds = getEditionHelper().getEditionList(researchObjectId, versionId);
+			Set<Edition> eds = getEditionHelper().getEditionList(
+				researchObjectId, versionId);
 			LinkedHashSet<Snapshot> snaps = new LinkedHashSet<Snapshot>();
 			for (Edition e : eds) {
-				snaps.add(new Snapshot(e.getId().getId(), e.isPublished(), e.getCreationDate()));
+				snaps.add(new Snapshot(e.getId().getId(), e.isPublished(), e
+						.getCreationDate()));
 			}
 			return snaps;
-		} catch (IdNotFoundException e) {
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public InputStream getZippedVersion(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, NotFoundException {
+	public InputStream getZippedVersion(String workspaceId,
+			String researchObjectId, String versionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			EditionId editionId = getEditionHelper().getLastEditionId(researchObjectId, versionId);
-			return getZippedVersion(workspaceId, researchObjectId, versionId, editionId.getId());
-		} catch (IdNotFoundException e) {
+			EditionId editionId = getEditionHelper().getLastEditionId(
+				researchObjectId, versionId);
+			return getZippedVersion(workspaceId, researchObjectId, versionId,
+				editionId.getId());
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public InputStream getZippedVersion(String workspaceId, String researchObjectId, String versionId, long editionId)
-			throws DigitalLibraryException, NotFoundException {
+	public InputStream getZippedVersion(String workspaceId,
+			String researchObjectId, String versionId, long editionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			return getPublicationsHelper().getZippedPublication(new EditionId(editionId));
-		} catch (IdNotFoundException e) {
+			return getPublicationsHelper().getZippedPublication(
+				new EditionId(editionId));
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void publishVersion(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, NotFoundException {
+	public void publishVersion(String workspaceId, String researchObjectId,
+			String versionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			getPublicationsHelper().publishPublication(researchObjectId, versionId);
-		} catch (IdNotFoundException e) {
+			getPublicationsHelper().publishPublication(researchObjectId,
+				versionId);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void unpublishVersion(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, NotFoundException {
+	public void unpublishVersion(String workspaceId, String researchObjectId,
+			String versionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			getPublicationsHelper().unpublishPublication(researchObjectId, versionId);
-		} catch (IdNotFoundException e) {
+			getPublicationsHelper().unpublishPublication(researchObjectId,
+				versionId);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public Snapshot createEdition(String workspaceId, String editionName, String researchObjectId, String versionId)
-			throws DigitalLibraryException, NotFoundException {
+	public Snapshot createEdition(String workspaceId, String editionName,
+			String researchObjectId, String versionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			return new Snapshot(getEditionHelper().createEdition(editionName, researchObjectId, versionId).getId(),
-					false, null);
-		} catch (IdNotFoundException e) {
+			return new Snapshot(getEditionHelper().createEdition(editionName,
+				researchObjectId, versionId).getId(), false, null);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void deleteVersion(String workspaceId, String researchObjectId, String versionId)
-			throws DigitalLibraryException, NotFoundException {
+	public void deleteVersion(String workspaceId, String researchObjectId,
+			String versionId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
-			getPublicationsHelper().deletePublication(researchObjectId, versionId);
-		} catch (IdNotFoundException e) {
+			getPublicationsHelper().deletePublication(researchObjectId,
+				versionId);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (IOException | DLibraException | TransformerException e) {
+		}
+		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public List<String> getWorkspaceIds() throws DigitalLibraryException, NotFoundException {
+	public List<String> getWorkspaceIds()
+		throws DigitalLibraryException, NotFoundException
+	{
 		List<AbstractPublicationInfo> infos;
 		try {
-			infos = getPublicationsHelper().listUserGroupPublications(Publication.PUB_GROUP_ROOT);
-		} catch (IdNotFoundException e) {
+			infos = getPublicationsHelper().listUserGroupPublications(
+				Publication.PUB_GROUP_ROOT);
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 		List<String> ids = new ArrayList<String>();
@@ -510,24 +714,34 @@ public class DLibraDataSource implements DigitalLibrary {
 		return ids;
 	}
 
+
 	@Override
-	public void createWorkspace(String workspaceId) throws DigitalLibraryException, NotFoundException {
+	public void createWorkspace(String workspaceId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
 			getPublicationsHelper().createGroupPublication(workspaceId);
-		} catch (IdNotFoundException e) {
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}
 
+
 	@Override
-	public void deleteWorkspace(String workspaceId) throws DigitalLibraryException, NotFoundException {
+	public void deleteWorkspace(String workspaceId)
+		throws DigitalLibraryException, NotFoundException
+	{
 		try {
 			getPublicationsHelper().deleteGroupPublication(workspaceId);
-		} catch (IdNotFoundException e) {
+		}
+		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
-		} catch (RemoteException | DLibraException e) {
+		}
+		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
 	}

@@ -29,16 +29,22 @@ import pl.psnc.dlibra.service.IdNotFoundException;
  * @author piotrhol
  * 
  */
-public class EditionHelper {
+public class EditionHelper
+{
 
-	private DLibraDataSource dLibra;
+	private final DLibraDataSource dLibra;
 
-	private PublicationManager publicationManager;
+	private final PublicationManager publicationManager;
 
-	public EditionHelper(DLibraDataSource dLibraDataSource) throws RemoteException {
+
+	public EditionHelper(DLibraDataSource dLibraDataSource)
+		throws RemoteException
+	{
 		this.dLibra = dLibraDataSource;
-		publicationManager = dLibraDataSource.getMetadataServer().getPublicationManager();
+		publicationManager = dLibraDataSource.getMetadataServer()
+				.getPublicationManager();
 	}
+
 
 	/**
 	 * Returns the most recently created edition of the RO version
@@ -51,13 +57,17 @@ public class EditionHelper {
 	 * @throws DLibraException
 	 *             in case no edition is found
 	 */
-	public Edition getLastEdition(PublicationId publicationId) throws RemoteException, DLibraException {
-		InputFilter in = new PublicationFilter(null, publicationId).setEditionState(Edition.ALL_STATES
-				- Edition.PERMANENT_DELETED);
+	public Edition getLastEdition(PublicationId publicationId)
+		throws RemoteException, DLibraException
+	{
+		InputFilter in = new PublicationFilter(null, publicationId)
+				.setEditionState(Edition.ALL_STATES - Edition.PERMANENT_DELETED);
 		OutputFilter out = new OutputFilter(Edition.class);
-		Collection<DLObject> results = publicationManager.getObjects(in, out).getResults();
+		Collection<DLObject> results = publicationManager.getObjects(in, out)
+				.getResults();
 		if (results.isEmpty()) {
-			throw new DLibraException(null, "No editions for publication " + publicationId) {
+			throw new DLibraException(null, "No editions for publication "
+					+ publicationId) {
 
 				private static final long serialVersionUID = -7493352685629908419L;
 				// TODO probably another exception would fit better here
@@ -67,8 +77,10 @@ public class EditionHelper {
 		for (DLObject object : results) {
 			Edition edition = (Edition) object;
 			if (result == null
-					|| edition.getCreationDate().after(result.getCreationDate())
-					|| (edition.getCreationDate().equals(result.getCreationDate()) && edition.getId().getId() > result
+					|| edition.getCreationDate()
+							.after(result.getCreationDate())
+					|| (edition.getCreationDate().equals(
+						result.getCreationDate()) && edition.getId().getId() > result
 							.getId().getId())) {
 				result = edition;
 			}
@@ -76,11 +88,15 @@ public class EditionHelper {
 		return result;
 	}
 
-	public Edition getEdition(EditionId editionId) throws RemoteException, DLibraException {
+
+	public Edition getEdition(EditionId editionId)
+		throws RemoteException, DLibraException
+	{
 		InputFilter in = new EditionFilter(editionId);
 		OutputFilter out = new OutputFilter(Edition.class);
 		return (Edition) publicationManager.getObjects(in, out).getResult();
 	}
+
 
 	/**
 	 * Returns id of the most recently created edition of the RO version
@@ -93,9 +109,12 @@ public class EditionHelper {
 	 * @throws DLibraException
 	 *             in case no edition is found
 	 */
-	public EditionId getLastEditionId(PublicationId publicationId) throws RemoteException, DLibraException {
+	public EditionId getLastEditionId(PublicationId publicationId)
+		throws RemoteException, DLibraException
+	{
 		return (EditionId) getLastEdition(publicationId).getId();
 	}
+
 
 	/**
 	 * First retrieves the publication, then looks for edition.
@@ -106,21 +125,27 @@ public class EditionHelper {
 	 * @throws RemoteException
 	 * @throws DLibraException
 	 */
-	public EditionId getLastEditionId(String groupPublicationName, String publicationName) throws RemoteException,
-			DLibraException {
-		PublicationId publicationId = dLibra.getPublicationsHelper().getPublicationId(groupPublicationName,
-				publicationName);
+	public EditionId getLastEditionId(String groupPublicationName,
+			String publicationName)
+		throws RemoteException, DLibraException
+	{
+		PublicationId publicationId = dLibra.getPublicationsHelper()
+				.getPublicationId(groupPublicationName, publicationName);
 		EditionId editionId = getLastEditionId(publicationId);
 		return editionId;
 	}
 
-	public Edition getLastEdition(String groupPublicationName, String publicationName) throws RemoteException,
-			DLibraException {
-		PublicationId publicationId = dLibra.getPublicationsHelper().getPublicationId(groupPublicationName,
-				publicationName);
+
+	public Edition getLastEdition(String groupPublicationName,
+			String publicationName)
+		throws RemoteException, DLibraException
+	{
+		PublicationId publicationId = dLibra.getPublicationsHelper()
+				.getPublicationId(groupPublicationName, publicationName);
 		Edition edition = getLastEdition(publicationId);
 		return edition;
 	}
+
 
 	/**
 	 * @param publicationName
@@ -133,13 +158,16 @@ public class EditionHelper {
 	 * @throws RemoteException
 	 * @throws IllegalArgumentException
 	 */
-	EditionId createEdition(String editionName, PublicationId publicationId, VersionId[] versionIds)
-			throws DLibraException, AccessDeniedException, IdNotFoundException, RemoteException,
-			IllegalArgumentException {
+	EditionId createEdition(String editionName, PublicationId publicationId,
+			VersionId[] versionIds)
+		throws DLibraException, AccessDeniedException, IdNotFoundException,
+		RemoteException, IllegalArgumentException
+	{
 		Edition edition = new Edition(null, publicationId, false);
 		edition.setName(editionName);
 		return publicationManager.createEdition(edition, versionIds);
 	}
+
 
 	/**
 	 * Creates an edition for a given publication, copying all files associated
@@ -152,22 +180,27 @@ public class EditionHelper {
 	 * @throws RemoteException
 	 * @throws DLibraException
 	 */
-	public EditionId createEdition(String editionName, String groupPublicationName, String publicationName)
-			throws RemoteException, DLibraException {
-		PublicationId publicationId = dLibra.getPublicationsHelper().getPublicationId(groupPublicationName,
-				publicationName);
+	public EditionId createEdition(String editionName,
+			String groupPublicationName, String publicationName)
+		throws RemoteException, DLibraException
+	{
+		PublicationId publicationId = dLibra.getPublicationsHelper()
+				.getPublicationId(groupPublicationName, publicationName);
 		EditionId prevEditionId = getLastEditionId(publicationId);
 
 		InputFilter in = new EditionFilter(prevEditionId);
 		OutputFilter out = new OutputFilter(VersionId.class);
-		List<Id> ids = (List<Id>) publicationManager.getObjects(in, out).getResultIds();
+		List<Id> ids = (List<Id>) publicationManager.getObjects(in, out)
+				.getResultIds();
 
 		List<VersionId> versionIds = new ArrayList<VersionId>(ids.size());
 		for (Id id : ids) {
 			versionIds.add((VersionId) id);
 		}
-		return createEdition(editionName, publicationId, versionIds.toArray(new VersionId[] {}));
+		return createEdition(editionName, publicationId,
+			versionIds.toArray(new VersionId[] {}));
 	}
+
 
 	/**
 	 * Returns a list of all editions for a given publication, sorted by date of
@@ -179,16 +212,20 @@ public class EditionHelper {
 	 * @throws RemoteException
 	 * @throws DLibraException
 	 */
-	public SortedSet<Edition> getEditionList(String groupPublicationName, String publicationName)
-			throws RemoteException, DLibraException {
-		TreeSet<Edition> result = new TreeSet<Edition>(new EditionCreatedComparator());
+	public SortedSet<Edition> getEditionList(String groupPublicationName,
+			String publicationName)
+		throws RemoteException, DLibraException
+	{
+		TreeSet<Edition> result = new TreeSet<Edition>(
+				new EditionCreatedComparator());
 
-		PublicationId publicationId = dLibra.getPublicationsHelper().getPublicationId(groupPublicationName,
-				publicationName);
-		InputFilter in = new PublicationFilter(null, publicationId).setEditionState(Edition.ALL_STATES
-				- Edition.PERMANENT_DELETED);
+		PublicationId publicationId = dLibra.getPublicationsHelper()
+				.getPublicationId(groupPublicationName, publicationName);
+		InputFilter in = new PublicationFilter(null, publicationId)
+				.setEditionState(Edition.ALL_STATES - Edition.PERMANENT_DELETED);
 		OutputFilter out = new OutputFilter(Edition.class);
-		Collection<DLObject> editions = publicationManager.getObjects(in, out).getResults();
+		Collection<DLObject> editions = publicationManager.getObjects(in, out)
+				.getResults();
 
 		for (DLObject object : editions) {
 			Edition edition = (Edition) object;
