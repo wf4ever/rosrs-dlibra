@@ -319,7 +319,7 @@ public class FilesHelper
 			new InputFilter(versionId), new OutputFilter(VersionInfo.class))
 				.getResultInfo();
 		long size = versionInfo.getSize();
-		return new ResourceInfo(name, digest, size);
+		return new ResourceInfo(name, digest, size, "MD5");
 	}
 
 

@@ -14,6 +14,8 @@ public class ResourceInfo
 
 	private final String checksum;
 
+	private final String digestMethod;
+
 	private final long sizeInBytes;
 
 
@@ -22,11 +24,13 @@ public class ResourceInfo
 	 * @param checksum
 	 * @param sizeInBytes
 	 */
-	public ResourceInfo(String name, String checksum, long sizeInBytes)
+	public ResourceInfo(String name, String checksum, long sizeInBytes,
+			String digestMethod)
 	{
 		this.name = name;
 		this.checksum = checksum;
 		this.sizeInBytes = sizeInBytes;
+		this.digestMethod = digestMethod;
 	}
 
 
@@ -45,6 +49,15 @@ public class ResourceInfo
 	public long getSizeInBytes()
 	{
 		return sizeInBytes;
+	}
+
+
+	/**
+	 * @return the digestMethod
+	 */
+	public String getDigestMethod()
+	{
+		return digestMethod;
 	}
 
 }
