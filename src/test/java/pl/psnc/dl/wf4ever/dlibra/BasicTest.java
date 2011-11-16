@@ -10,6 +10,8 @@ import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.Properties;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,6 +32,8 @@ public class BasicTest
 	private long workspacesDirectory;
 
 	private long collectionId;
+
+	private static final String USERNAME = "John Doe";
 
 	private static final String ADMIN_ID = "wfadmin";
 
@@ -72,19 +76,42 @@ public class BasicTest
 	@Test
 	public final void testCreateVersionStringStringStringURI()
 		throws RemoteException, MalformedURLException, UnknownHostException,
-		DLibraException, DigitalLibraryException, NotFoundException, ConflictException
+		DLibraException, DigitalLibraryException, NotFoundException,
+		ConflictException
 	{
 		DLibraDataSource dlA = new DLibraDataSource(host, port,
 				workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
-		dlA.createUser(USER_ID, USER_PASSWORD);
+		dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
 		DLibraDataSource dl = new DLibraDataSource(host, port,
 				workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
 		dl.createWorkspace("w");
 		dl.createResearchObject("w", "r");
 		dl.createVersion("w", "r", "v");
 		dl.deleteWorkspace("w");
-		dlA = new DLibraDataSource(host, port,
+		dlA = new DLibraDataSource(host, port, workspacesDirectory,
+				collectionId, ADMIN_ID, ADMIN_PASSWORD);
+		dlA.deleteUser(USER_ID);
+	}
+
+
+	@Test
+	public final void testGetUserProfile()
+		throws RemoteException, MalformedURLException, UnknownHostException,
+		DLibraException, DigitalLibraryException, NotFoundException,
+		ConflictException
+	{
+		DLibraDataSource dlA = new DLibraDataSource(host, port,
 				workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
+		dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
+		DLibraDataSource dl = new DLibraDataSource(host, port,
+				workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
+		UserProfile user = dl.getUserProfile();
+		Assert.assertEquals("User login is equal", USER_ID, user.getLogin());
+		Assert.assertEquals("User name is equal", USERNAME, user.getName());
+		Assert.assertEquals("User password is equal", USER_PASSWORD,
+			user.getPassword());
+		dlA = new DLibraDataSource(host, port, workspacesDirectory,
+				collectionId, ADMIN_ID, ADMIN_PASSWORD);
 		dlA.deleteUser(USER_ID);
 	}
 }

@@ -511,11 +511,11 @@ public class DLibraDataSource
 
 
 	@Override
-	public void createUser(String userId, String password)
+	public void createUser(String userId, String password, String username)
 		throws DigitalLibraryException, NotFoundException, ConflictException
 	{
 		try {
-			getUsersHelper().createUser(userId, password);
+			getUsersHelper().createUser(userId, password, username);
 		}
 		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);

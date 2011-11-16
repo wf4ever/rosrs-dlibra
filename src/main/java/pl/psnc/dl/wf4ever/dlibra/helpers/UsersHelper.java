@@ -58,10 +58,11 @@ public class UsersHelper
 	* Creates user in dLibra, equivalent to workspace in ROSRS.
 	* @param login
 	* @param password
+	 * @param username 
 	* @throws RemoteException
 	* @throws DLibraException
 	*/
-	public void createUser(String login, String password)
+	public void createUser(String login, String password, String username)
 		throws RemoteException, DLibraException
 	{
 		// check if user already exists
@@ -76,7 +77,7 @@ public class UsersHelper
 
 		DirectoryId workspaceDir = createDirectory(login);
 
-		User user = new User(login);
+		User user = new User(username);
 		user.setPassword(password);
 		user.setHomedir(workspaceDir);
 		user.setType(Actor.USER);
