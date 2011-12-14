@@ -10,26 +10,30 @@ package pl.psnc.dl.wf4ever.dlibra;
 public class UserProfile
 {
 
+	public enum Role {
+		ADMIN, AUTHENTICATED, PUBLIC
+	}
+
 	private final String login;
 
 	private final String password;
 
 	private final String name;
 
-	private final boolean admin;
+	private final Role role;
 
 
 	/**
 	 * @param login
 	 * @param name
 	 */
-	public UserProfile(String login, String password, String name, boolean admin)
+	public UserProfile(String login, String password, String name, Role role)
 	{
 		super();
 		this.login = login;
 		this.password = password;
 		this.name = name;
-		this.admin = admin;
+		this.role = role;
 	}
 
 
@@ -54,9 +58,9 @@ public class UserProfile
 	}
 
 
-	public boolean isAdmin()
+	public Role getRole()
 	{
-		return admin;
+		return role;
 	}
 
 }

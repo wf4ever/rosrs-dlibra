@@ -22,6 +22,7 @@ import pl.psnc.dl.wf4ever.dlibra.NotFoundException;
 import pl.psnc.dl.wf4ever.dlibra.ResourceInfo;
 import pl.psnc.dl.wf4ever.dlibra.Snapshot;
 import pl.psnc.dl.wf4ever.dlibra.UserProfile;
+import pl.psnc.dl.wf4ever.dlibra.UserProfile.Role;
 import pl.psnc.dlibra.content.ContentServer;
 import pl.psnc.dlibra.metadata.AbstractPublicationInfo;
 import pl.psnc.dlibra.metadata.DirectoryId;
@@ -198,8 +199,15 @@ public class DLibraDataSource
 		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
-		return new UserProfile(userLogin, userPassword, user.getName(),
-				userLogin.equals("wfadmin"));
+		//FIXME should be based on sth else than login
+		UserProfile.Role role;
+		if (userLogin.equals("wfadmin"))
+			role = Role.ADMIN;
+		else if (userLogin.equals("wf4ever_reader"))
+			role = Role.PUBLIC;
+		else
+			role = Role.AUTHENTICATED;
+		return new UserProfile(userLogin, userPassword, user.getName(), role);
 	}
 
 
