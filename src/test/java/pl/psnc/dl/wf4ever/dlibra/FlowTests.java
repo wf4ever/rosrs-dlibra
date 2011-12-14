@@ -132,7 +132,8 @@ public class FlowTests
 
 	@Test
 	public final void testAddingResources()
-		throws DigitalLibraryException, IOException, NotFoundException
+		throws DigitalLibraryException, IOException, NotFoundException,
+		ConflictException
 	{
 		createOrUpdateFile(files[0]);
 		createOrUpdateFile(files[1]);
@@ -274,7 +275,7 @@ public class FlowTests
 
 
 	private void createVersionAsCopy()
-		throws DigitalLibraryException, NotFoundException
+		throws DigitalLibraryException, NotFoundException, ConflictException
 	{
 		dl.createVersion(w, r, v2);
 	}

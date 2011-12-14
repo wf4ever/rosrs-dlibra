@@ -419,7 +419,7 @@ public class DLibraDataSource
 
 	@Override
 	public void createResearchObject(String workspaceId, String researchObjectId)
-		throws DigitalLibraryException, NotFoundException
+		throws DigitalLibraryException, NotFoundException, ConflictException
 	{
 		try {
 			getPublicationsHelper().createGroupPublication(workspaceId,
@@ -427,6 +427,9 @@ public class DLibraDataSource
 		}
 		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
+		}
+		catch (DuplicatedValueException e) {
+			throw new ConflictException(e);
 		}
 		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
@@ -461,7 +464,7 @@ public class DLibraDataSource
 	@Override
 	public void createVersion(String workspaceId, String researchObjectId,
 			String version)
-		throws DigitalLibraryException, NotFoundException
+		throws DigitalLibraryException, NotFoundException, ConflictException
 	{
 		try {
 			getPublicationsHelper().createPublication(researchObjectId,
@@ -469,6 +472,9 @@ public class DLibraDataSource
 		}
 		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
+		}
+		catch (DuplicatedValueException e) {
+			throw new ConflictException(e);
 		}
 		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
@@ -717,13 +723,16 @@ public class DLibraDataSource
 
 	@Override
 	public void createWorkspace(String workspaceId)
-		throws DigitalLibraryException, NotFoundException
+		throws DigitalLibraryException, NotFoundException, ConflictException
 	{
 		try {
 			getPublicationsHelper().createGroupPublication(workspaceId);
 		}
 		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
+		}
+		catch (DuplicatedValueException e) {
+			throw new ConflictException(e);
 		}
 		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());

@@ -3,6 +3,8 @@
  */
 package pl.psnc.dl.wf4ever.dlibra;
 
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
@@ -12,6 +14,7 @@ import java.util.Properties;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,6 +66,29 @@ public class BasicTest
 	}
 
 
+	@After
+	public void tearDown()
+	{
+		try {
+			DLibraDataSource dl = new DLibraDataSource(host, port,
+					workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
+			dl.deleteWorkspace("w");
+		}
+		catch (Exception e) {
+
+		}
+		try {
+			DLibraDataSource dlA = new DLibraDataSource(host, port,
+					workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
+			dlA.deleteUser(USER_ID);
+		}
+		catch (Exception e) {
+
+		}
+
+	}
+
+
 	/**
 	 * Test method for {@link pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource#createVersion(java.lang.String, java.lang.String, java.lang.String, java.net.URI)}.
 	 * @throws DLibraException 
@@ -87,10 +113,6 @@ public class BasicTest
 		dl.createWorkspace("w");
 		dl.createResearchObject("w", "r");
 		dl.createVersion("w", "r", "v");
-		dl.deleteWorkspace("w");
-		dlA = new DLibraDataSource(host, port, workspacesDirectory,
-				collectionId, ADMIN_ID, ADMIN_PASSWORD);
-		dlA.deleteUser(USER_ID);
 	}
 
 
@@ -110,8 +132,59 @@ public class BasicTest
 		Assert.assertEquals("User name is equal", USERNAME, user.getName());
 		Assert.assertEquals("User password is equal", USER_PASSWORD,
 			user.getPassword());
-		dlA = new DLibraDataSource(host, port, workspacesDirectory,
-				collectionId, ADMIN_ID, ADMIN_PASSWORD);
-		dlA.deleteUser(USER_ID);
 	}
+
+
+	@Test
+	public final void testCreateDuplicateVersion()
+		throws RemoteException, MalformedURLException, UnknownHostException,
+		DLibraException, DigitalLibraryException, NotFoundException,
+		ConflictException
+	{
+		DLibraDataSource dlA = new DLibraDataSource(host, port,
+				workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
+		dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
+		DLibraDataSource dl = new DLibraDataSource(host, port,
+				workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
+		dl.createWorkspace("w");
+		dl.createResearchObject("w", "r");
+		dl.createVersion("w", "r", "v");
+		try {
+			dl.createVersion("w", "r", "v");
+			fail("Should throw some exception");
+		}
+		catch (ConflictException e) {
+			// good
+		}
+		catch (Exception e) {
+			fail("Threw a wrong exception: " + e.getClass().toString());
+		}
+	}
+
+
+	@Test
+	public final void testCreateDuplicateRO()
+		throws RemoteException, MalformedURLException, UnknownHostException,
+		DLibraException, DigitalLibraryException, NotFoundException,
+		ConflictException
+	{
+		DLibraDataSource dlA = new DLibraDataSource(host, port,
+				workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
+		dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
+		DLibraDataSource dl = new DLibraDataSource(host, port,
+				workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
+		dl.createWorkspace("w");
+		dl.createResearchObject("w", "r");
+		try {
+			dl.createResearchObject("w", "r");
+			fail("Should throw some exception");
+		}
+		catch (ConflictException e) {
+			// good
+		}
+		catch (Exception e) {
+			fail("Threw a wrong exception: " + e.getClass().toString());
+		}
+	}
+
 }

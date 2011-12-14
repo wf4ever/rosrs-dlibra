@@ -401,7 +401,7 @@ public class PublicationsHelper
 		Collection<Info> resultInfos = publicationManager
 				.getObjects(
 					new PublicationFilter(null, groupId)
-							.setGroupStatus(Publication.PUB_GROUP_LEAF)
+							.setGroupStatus(Publication.PUB_GROUP_ALL)
 							.setPublicationState(
 								(byte) (Publication.PUB_STATE_ALL - Publication.PUB_STATE_PERMANENT_DELETED)),
 					new OutputFilter(AbstractPublicationInfo.class))

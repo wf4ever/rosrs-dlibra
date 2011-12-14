@@ -77,7 +77,7 @@ public interface DigitalLibrary
 
 
 	public void createResearchObject(String workspaceId, String researchObjectId)
-		throws DigitalLibraryException, NotFoundException;
+		throws DigitalLibraryException, NotFoundException, ConflictException;
 
 
 	public List<String> getVersionIds(String workspaceId,
@@ -87,7 +87,7 @@ public interface DigitalLibrary
 
 	public void createVersion(String workspaceId, String researchObjectId,
 			String version)
-		throws DigitalLibraryException, NotFoundException;
+		throws DigitalLibraryException, NotFoundException, ConflictException;
 
 
 	public void createVersion(String workspaceId, String researchObjectId,
@@ -151,7 +151,7 @@ public interface DigitalLibrary
 
 
 	public void createWorkspace(String workspaceId)
-		throws DigitalLibraryException, NotFoundException;
+		throws DigitalLibraryException, NotFoundException, ConflictException;
 
 
 	public void deleteWorkspace(String workspaceId)
