@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ import pl.psnc.dlibra.metadata.EditionId;
 import pl.psnc.dlibra.metadata.LibCollectionId;
 import pl.psnc.dlibra.metadata.MetadataServer;
 import pl.psnc.dlibra.metadata.Publication;
+import pl.psnc.dlibra.metadata.PublicationId;
 import pl.psnc.dlibra.metadata.PublicationInfo;
 import pl.psnc.dlibra.mgmt.DLStaticServiceResolver;
 import pl.psnc.dlibra.mgmt.UserServiceResolver;
@@ -40,6 +42,9 @@ import pl.psnc.dlibra.service.DuplicatedValueException;
 import pl.psnc.dlibra.service.IdNotFoundException;
 import pl.psnc.dlibra.service.ServiceUrl;
 import pl.psnc.dlibra.system.UserInterface;
+import pl.psnc.dlibra.user.ActorId;
+import pl.psnc.dlibra.user.PublicationRightId;
+import pl.psnc.dlibra.user.RightOperation;
 import pl.psnc.dlibra.user.User;
 import pl.psnc.dlibra.user.UserManager;
 
@@ -734,7 +739,19 @@ public class DLibraDataSource
 		throws DigitalLibraryException, NotFoundException, ConflictException
 	{
 		try {
-			getPublicationsHelper().createGroupPublication(workspaceId);
+			PublicationId id = getPublicationsHelper().createGroupPublication(
+				workspaceId);
+			ActorId publicUserId = userManager.getActorId("wf4ever_reader");
+
+			DLStaticServiceResolver
+					.getUserServer(serviceResolver, null)
+					.getRightManager()
+					.setPublicationRights(
+						id,
+						Arrays.asList(publicUserId),
+						new RightOperation(PublicationRightId.PUBLICATION_READ,
+								RightOperation.ADD));
+
 		}
 		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);

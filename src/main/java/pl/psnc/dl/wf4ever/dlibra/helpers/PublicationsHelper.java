@@ -115,10 +115,11 @@ public class PublicationsHelper
 	 * Creates a new group publication (workspace) for the current user.
 	 * 
 	 * @param groupPublicationName
+	 * @return 
 	 * @throws RemoteException
 	 * @throws DLibraException
 	 */
-	public void createGroupPublication(String groupPublicationName)
+	public PublicationId createGroupPublication(String groupPublicationName)
 		throws RemoteException, DLibraException
 	{
 		DirectoryId parent = getWorkspaceDirectoryId();
@@ -135,7 +136,7 @@ public class PublicationsHelper
 		publication.setGroupStatus(Publication.PUB_GROUP_ROOT);
 		publication.setName(groupPublicationName);
 
-		publicationManager.createPublication(publication);
+		return publicationManager.createPublication(publication);
 	}
 
 

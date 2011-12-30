@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
+import pl.psnc.dlibra.service.DLibraException;
 
 /**
  * @author piotrek
@@ -42,6 +43,10 @@ public class FlowTests
 	private static final String ADMIN_ID = "wfadmin";
 
 	private static final String ADMIN_PASSWORD = "wfadmin!!!";
+
+	private static final String READER_LOGIN = "wf4ever_reader";
+
+	private static final String READER_PASSWORD = "wf4ever_reader!!!";
 
 	private String userId;
 
@@ -123,6 +128,8 @@ public class FlowTests
 	public void tearDown()
 		throws Exception
 	{
+		dl = new DLibraDataSource(host, port, workspacesDirectory,
+				collectionId, userId, USER_PASSWORD);
 		dl.deleteWorkspace("w");
 		dl = new DLibraDataSource(host, port, workspacesDirectory,
 				collectionId, ADMIN_ID, ADMIN_PASSWORD);
@@ -192,6 +199,22 @@ public class FlowTests
 		checkPublished(edId2);
 		unpublishEdition();
 		checkNoEditionPublished();
+	}
+
+
+	@Test
+	public final void testPermissions()
+		throws DigitalLibraryException, IOException, NotFoundException,
+		ConflictException, DLibraException
+	{
+		createOrUpdateFile(files[0]);
+		createOrUpdateFile(files[1]);
+		dl = new DLibraDataSource(host, port, workspacesDirectory,
+				collectionId, READER_LOGIN, READER_PASSWORD);
+		checkCantCreateOrUpdateFile(files[0]);
+		checkCantCreateOrUpdateFile(files[1]);
+		checkNoFile(files[0].path);
+		checkNoFile(files[1].path);
 	}
 
 
@@ -327,6 +350,24 @@ public class FlowTests
 			file.mimeType);
 		f.close();
 		assertNotNull(r1);
+	}
+
+
+	private void checkCantCreateOrUpdateFile(FileRecord file)
+		throws DigitalLibraryException, IOException
+	{
+		InputStream f = file.open();
+		try {
+			dl.createOrUpdateFile(w, r, v, file.path, f, file.mimeType);
+			fail("Should throw an exception when creating file");
+		}
+		catch (NotFoundException e) {
+			// good
+		}
+		finally {
+			f.close();
+		}
+
 	}
 
 
