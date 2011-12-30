@@ -23,6 +23,7 @@ import pl.psnc.dlibra.common.OutputFilter;
 import pl.psnc.dlibra.metadata.AbstractPublicationInfo;
 import pl.psnc.dlibra.metadata.DirectoryFilter;
 import pl.psnc.dlibra.metadata.DirectoryId;
+import pl.psnc.dlibra.metadata.DirectoryInfo;
 import pl.psnc.dlibra.metadata.DirectoryManager;
 import pl.psnc.dlibra.metadata.Edition;
 import pl.psnc.dlibra.metadata.EditionId;
@@ -377,19 +378,39 @@ public class PublicationsHelper
 	PublicationId getGroupId(String groupPublicationName)
 		throws RemoteException, DLibraException
 	{
+		if (getWorkspaceDirectoryId() != null)
+			return getGroupId(groupPublicationName, getWorkspaceDirectoryId());
+		else
+			return getGroupId(groupPublicationName,
+				dLibra.getWorkspacesContainerDirectoryId());
+	}
+
+
+	PublicationId getGroupId(String groupPublicationName,
+			DirectoryId directoryId)
+		throws RemoteException, DLibraException
+	{
 		Collection<Info> resultInfos = directoryManager
 				.getObjects(
-					new DirectoryFilter(null, getWorkspaceDirectoryId())
+					new DirectoryFilter(null, directoryId)
 							.setGroupStatus(
 								(byte) (Publication.PUB_GROUP_ROOT | Publication.PUB_GROUP_MID))
 							.setState(
 								(byte) (Publication.PUB_STATE_ALL - Publication.PUB_STATE_PERMANENT_DELETED)),
-					new OutputFilter(ElementInfo.class, List.class))
-				.getResultInfos();
+					new OutputFilter(Info.class, List.class)).getResultInfos();
 		for (Info info : resultInfos) {
 			if (info instanceof GroupPublicationInfo
 					&& info.getLabel().equals(groupPublicationName)) {
 				return (PublicationId) info.getId();
+			}
+			if (info instanceof DirectoryInfo) {
+				try {
+					return getGroupId(groupPublicationName,
+						(DirectoryId) info.getId());
+				}
+				catch (IdNotFoundException e) {
+					//keep searching
+				}
 			}
 		}
 		throw new IdNotFoundException(groupPublicationName);

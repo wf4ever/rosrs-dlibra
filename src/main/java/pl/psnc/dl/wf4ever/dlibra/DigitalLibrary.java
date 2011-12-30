@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
+import pl.psnc.dlibra.service.AccessDeniedException;
+
 /**
  * @author piotrhol
  * 
@@ -64,7 +66,8 @@ public interface DigitalLibrary
 	public ResourceInfo createOrUpdateFile(String workspaceId,
 			String researchObjectId, String versionId, String filePath,
 			InputStream inputStream, String type)
-		throws DigitalLibraryException, NotFoundException;
+		throws DigitalLibraryException, NotFoundException,
+		AccessDeniedException;
 
 
 	public void deleteFile(String workspaceId, String researchObjectId,

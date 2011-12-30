@@ -7,7 +7,6 @@ import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,15 +35,13 @@ import pl.psnc.dlibra.metadata.PublicationId;
 import pl.psnc.dlibra.metadata.PublicationInfo;
 import pl.psnc.dlibra.mgmt.DLStaticServiceResolver;
 import pl.psnc.dlibra.mgmt.UserServiceResolver;
+import pl.psnc.dlibra.service.AccessDeniedException;
 import pl.psnc.dlibra.service.AuthorizationToken;
 import pl.psnc.dlibra.service.DLibraException;
 import pl.psnc.dlibra.service.DuplicatedValueException;
 import pl.psnc.dlibra.service.IdNotFoundException;
 import pl.psnc.dlibra.service.ServiceUrl;
 import pl.psnc.dlibra.system.UserInterface;
-import pl.psnc.dlibra.user.ActorId;
-import pl.psnc.dlibra.user.PublicationRightId;
-import pl.psnc.dlibra.user.RightOperation;
 import pl.psnc.dlibra.user.User;
 import pl.psnc.dlibra.user.UserManager;
 
@@ -375,7 +372,8 @@ public class DLibraDataSource
 	public ResourceInfo createOrUpdateFile(String workspaceId,
 			String researchObjectId, String versionId, String filePath,
 			InputStream inputStream, String type)
-		throws DigitalLibraryException, NotFoundException
+		throws DigitalLibraryException, NotFoundException,
+		AccessDeniedException
 	{
 		try {
 			return getFilesHelper().createOrUpdateFile(researchObjectId,
@@ -383,6 +381,9 @@ public class DLibraDataSource
 		}
 		catch (IdNotFoundException e) {
 			throw new NotFoundException(e);
+		}
+		catch (AccessDeniedException e) {
+			throw e;
 		}
 		catch (IOException | DLibraException | TransformerException e) {
 			throw new DigitalLibraryException(e.getMessage());
@@ -741,16 +742,7 @@ public class DLibraDataSource
 		try {
 			PublicationId id = getPublicationsHelper().createGroupPublication(
 				workspaceId);
-			ActorId publicUserId = userManager.getActorId("wf4ever_reader");
-
-			DLStaticServiceResolver
-					.getUserServer(serviceResolver, null)
-					.getRightManager()
-					.setPublicationRights(
-						id,
-						Arrays.asList(publicUserId),
-						new RightOperation(PublicationRightId.PUBLICATION_READ,
-								RightOperation.ADD));
+			getUsersHelper().grantReadAccessToPublication(id);
 
 		}
 		catch (IdNotFoundException e) {

@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
+import pl.psnc.dlibra.service.AccessDeniedException;
 import pl.psnc.dlibra.service.DLibraException;
 
 /**
@@ -140,7 +141,7 @@ public class FlowTests
 	@Test
 	public final void testAddingResources()
 		throws DigitalLibraryException, IOException, NotFoundException,
-		ConflictException
+		ConflictException, AccessDeniedException
 	{
 		createOrUpdateFile(files[0]);
 		createOrUpdateFile(files[1]);
@@ -160,7 +161,8 @@ public class FlowTests
 
 	@Test
 	public final void testEmptyDirectory()
-		throws DigitalLibraryException, IOException, NotFoundException
+		throws DigitalLibraryException, IOException, NotFoundException,
+		AccessDeniedException
 	{
 		createOrUpdateDirectory(directories[1]);
 		getZippedFolder(directories[1]);
@@ -174,7 +176,8 @@ public class FlowTests
 
 	@Test
 	public final void testEditions()
-		throws DigitalLibraryException, IOException, NotFoundException
+		throws DigitalLibraryException, IOException, NotFoundException,
+		AccessDeniedException
 	{
 		long edId1 = createEdition();
 		createOrUpdateFile(files[0]);
@@ -211,10 +214,10 @@ public class FlowTests
 		createOrUpdateFile(files[1]);
 		dl = new DLibraDataSource(host, port, workspacesDirectory,
 				collectionId, READER_LOGIN, READER_PASSWORD);
+		getFileContent(files[0]);
+		getFileContent(files[1]);
 		checkCantCreateOrUpdateFile(files[0]);
 		checkCantCreateOrUpdateFile(files[1]);
-		checkNoFile(files[0].path);
-		checkNoFile(files[1].path);
 	}
 
 
@@ -343,7 +346,8 @@ public class FlowTests
 
 
 	private void createOrUpdateFile(FileRecord file)
-		throws DigitalLibraryException, IOException, NotFoundException
+		throws DigitalLibraryException, IOException, NotFoundException,
+		AccessDeniedException
 	{
 		InputStream f = file.open();
 		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, file.path, f,
@@ -354,14 +358,14 @@ public class FlowTests
 
 
 	private void checkCantCreateOrUpdateFile(FileRecord file)
-		throws DigitalLibraryException, IOException
+		throws DigitalLibraryException, IOException, NotFoundException
 	{
 		InputStream f = file.open();
 		try {
 			dl.createOrUpdateFile(w, r, v, file.path, f, file.mimeType);
 			fail("Should throw an exception when creating file");
 		}
-		catch (NotFoundException e) {
+		catch (AccessDeniedException e) {
 			// good
 		}
 		finally {
@@ -372,7 +376,8 @@ public class FlowTests
 
 
 	private void createOrUpdateDirectory(String path)
-		throws DigitalLibraryException, IOException, NotFoundException
+		throws DigitalLibraryException, IOException, NotFoundException,
+		AccessDeniedException
 	{
 		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, path,
 			new ByteArrayInputStream(new byte[0]), "text/plain");
