@@ -24,6 +24,7 @@ import pl.psnc.dlibra.user.Actor;
 import pl.psnc.dlibra.user.ActorId;
 import pl.psnc.dlibra.user.DirectoryRightId;
 import pl.psnc.dlibra.user.LibCollectionRightId;
+import pl.psnc.dlibra.user.LibraryRightId;
 import pl.psnc.dlibra.user.PublicationRightId;
 import pl.psnc.dlibra.user.RightOperation;
 import pl.psnc.dlibra.user.User;
@@ -121,6 +122,11 @@ public class UsersHelper
 			dLibra.getCollectionId(),
 			Arrays.asList((ActorId) userId),
 			new RightOperation(LibCollectionRightId.COLLECTION_CONTENT_MGMT,
+					RightOperation.ADD));
+		// modify attributes
+		userServer.getRightManager().setLibraryRights(
+			usersWithRead,
+			new RightOperation(LibraryRightId.ATTRIBUTES_MGMT,
 					RightOperation.ADD));
 	}
 

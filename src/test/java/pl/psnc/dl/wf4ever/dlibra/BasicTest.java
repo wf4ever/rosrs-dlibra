@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.Date;
@@ -20,6 +21,9 @@ import org.junit.Test;
 
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
 import pl.psnc.dlibra.service.DLibraException;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * @author piotrhol
@@ -187,4 +191,25 @@ public class BasicTest
 		}
 	}
 
+
+	@Test
+	public final void testStoreAttributes()
+		throws RemoteException, MalformedURLException, UnknownHostException,
+		DLibraException, DigitalLibraryException, NotFoundException,
+		ConflictException
+	{
+		DLibraDataSource dlA = new DLibraDataSource(host, port,
+				workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
+		dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
+		DLibraDataSource dl = new DLibraDataSource(host, port,
+				workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
+		dl.createWorkspace("w");
+		dl.createResearchObject("w", "r");
+		dl.createVersion("w", "r", "v");
+		Multimap<URI, Object> atts = HashMultimap.create();
+		atts.put(URI.create("a"), "foo");
+		atts.put(URI.create("a"), "bar");
+		atts.put(URI.create("b"), "lorem ipsum");
+		dl.storeAttributes("w", "r", "v", atts);
+	}
 }

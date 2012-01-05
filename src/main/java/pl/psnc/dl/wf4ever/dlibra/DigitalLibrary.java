@@ -4,10 +4,13 @@
 package pl.psnc.dl.wf4ever.dlibra;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
 import pl.psnc.dlibra.service.AccessDeniedException;
+
+import com.google.common.collect.Multimap;
 
 /**
  * @author piotrhol
@@ -159,4 +162,18 @@ public interface DigitalLibrary
 
 	public void deleteWorkspace(String workspaceId)
 		throws DigitalLibraryException, NotFoundException;
+
+
+	/**
+	 * Stores attributes in dLibra for a given RO
+	 * @param workspaceId
+	 * @param researchObjectId
+	 * @param versionId
+	 * @param roAttributes pairs of property URIs and values (String, Calendar, other...)
+	 * @throws NotFoundException 
+	 * @throws DigitalLibraryException 
+	 */
+	public void storeAttributes(String workspaceId, String researchObjectId,
+			String versionId, Multimap<URI, Object> roAttributes)
+		throws NotFoundException, DigitalLibraryException;
 }

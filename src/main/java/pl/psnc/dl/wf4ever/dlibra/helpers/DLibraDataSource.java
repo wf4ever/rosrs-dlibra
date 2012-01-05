@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -45,6 +46,8 @@ import pl.psnc.dlibra.system.UserInterface;
 import pl.psnc.dlibra.user.User;
 import pl.psnc.dlibra.user.UserManager;
 
+import com.google.common.collect.Multimap;
+
 /**
  * 
  * @author nowakm, piotrhol
@@ -82,6 +85,8 @@ public class DLibraDataSource
 
 	private final FilesHelper filesHelper;
 
+	private final AttributesHelper attributesHelper;
+
 	private final DirectoryId workspacesContainerDirectoryId;
 
 	private final LibCollectionId collectionId;
@@ -118,6 +123,16 @@ public class DLibraDataSource
 		publicationsHelper = new PublicationsHelper(this);
 		filesHelper = new FilesHelper(this);
 		editionHelper = new EditionHelper(this);
+		attributesHelper = new AttributesHelper(this);
+	}
+
+
+	/**
+	 * @return the attributesHelper
+	 */
+	AttributesHelper getAttributesHelper()
+	{
+		return attributesHelper;
 	}
 
 
@@ -770,5 +785,24 @@ public class DLibraDataSource
 		catch (RemoteException | DLibraException e) {
 			throw new DigitalLibraryException(e.getMessage());
 		}
+	}
+
+
+	@Override
+	public void storeAttributes(String workspaceId, String researchObjectId,
+			String versionId, Multimap<URI, Object> roAttributes)
+		throws NotFoundException, DigitalLibraryException
+	{
+		try {
+			getAttributesHelper().storeAttributes(workspaceId,
+				researchObjectId, versionId, roAttributes);
+		}
+		catch (IdNotFoundException e) {
+			throw new NotFoundException(e);
+		}
+		catch (RemoteException | DLibraException e) {
+			throw new DigitalLibraryException(e.getMessage());
+		}
+
 	}
 }
