@@ -2,8 +2,10 @@ package pl.psnc.dl.wf4ever.dlibra.helpers;
 
 import java.net.URI;
 import java.rmi.RemoteException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +42,9 @@ public class AttributesHelper
 			.getLogger(AttributesHelper.class);
 
 	public static final String ATTRIBUTE_LANGUAGE = Language.UNIVERSAL;
+
+	public static final SimpleDateFormat SDF = new SimpleDateFormat(
+			"yyyy.MM.dd HH:mm:ss z");
 
 	private final DLibraDataSource dl;
 
@@ -107,7 +112,14 @@ public class AttributesHelper
 			AttributeValue attValue = new AttributeValue(null);
 			attValue.setAttributeId(attributeInfo.getId());
 			//TODO not always toString, for example Calendar needs to be nicely printed
-			attValue.setValue(o.toString());
+			String s = null;
+			if (o instanceof Calendar) {
+				s = SDF.format(((Calendar) o).getTime());
+			}
+			else {
+				s = o.toString();
+			}
+			attValue.setValue(s);
 			attValue.setLanguageName(ATTRIBUTE_LANGUAGE);
 			attValue = createAttributeValue(attValue);
 
