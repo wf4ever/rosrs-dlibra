@@ -214,7 +214,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 		//FIXME should be based on sth else than login
 		UserProfile.Role role;
@@ -243,7 +243,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -262,7 +262,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -282,7 +282,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -301,7 +301,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -321,7 +321,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -340,7 +340,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -360,7 +360,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -378,7 +378,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -401,7 +401,7 @@ public class DLibraDataSource
 			throw e;
 		}
 		catch (IOException | DLibraException | TransformerException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -418,7 +418,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (IOException | DLibraException | TransformerException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -436,7 +436,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 		List<String> ids = new ArrayList<String>();
 		for (AbstractPublicationInfo info : infos) {
@@ -461,7 +461,7 @@ public class DLibraDataSource
 			throw new ConflictException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -480,7 +480,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 		List<String> ids = new ArrayList<String>();
 		for (AbstractPublicationInfo info : infos) {
@@ -506,7 +506,7 @@ public class DLibraDataSource
 			throw new ConflictException(e);
 		}
 		catch (IOException | DLibraException | TransformerException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -524,7 +524,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (IOException | DLibraException | TransformerException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -540,7 +540,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -559,7 +559,7 @@ public class DLibraDataSource
 			throw new ConflictException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -572,7 +572,7 @@ public class DLibraDataSource
 			return getUsersHelper().userExists(userId);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -588,7 +588,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -612,7 +612,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -632,7 +632,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -650,7 +650,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -668,7 +668,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -686,7 +686,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -704,7 +704,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -722,7 +722,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (IOException | DLibraException | TransformerException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -740,7 +740,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 		List<String> ids = new ArrayList<String>();
 		for (AbstractPublicationInfo info : infos) {
@@ -767,7 +767,7 @@ public class DLibraDataSource
 			throw new ConflictException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -783,7 +783,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 	}
 
@@ -801,7 +801,7 @@ public class DLibraDataSource
 			throw new NotFoundException(e);
 		}
 		catch (RemoteException | DLibraException e) {
-			throw new DigitalLibraryException(e.getMessage());
+			throw new DigitalLibraryException(e);
 		}
 
 	}

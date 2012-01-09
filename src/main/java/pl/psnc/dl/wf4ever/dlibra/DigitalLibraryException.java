@@ -5,7 +5,7 @@ package pl.psnc.dl.wf4ever.dlibra;
 
 /**
  * @author piotrhol
- *
+ * 
  */
 public class DigitalLibraryException
 	extends Exception
@@ -17,9 +17,9 @@ public class DigitalLibraryException
 	private static final long serialVersionUID = 8004921765200303834L;
 
 
-	public DigitalLibraryException(String message)
+	public DigitalLibraryException(Exception e)
 	{
-		super(message);
+		super(e);
 	}
 
 }
