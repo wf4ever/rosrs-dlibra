@@ -69,6 +69,12 @@ public class FlowTests
 
 	private static final String v2 = "v2";
 
+	private static final String MAIN_FILE_MIME_TYPE = "text/plain";
+
+	private static final String MAIN_FILE_CONTENT = "test";
+
+	private static final String MAIN_FILE_PATH = "mainFile.txt";
+
 
 	/**
 	 * @throws java.lang.Exception
@@ -77,14 +83,12 @@ public class FlowTests
 	public static void setUpBeforeClass()
 		throws Exception
 	{
-		InputStream inputStream = FlowTests.class.getClassLoader()
-				.getResourceAsStream("connection.properties");
+		InputStream inputStream = FlowTests.class.getClassLoader().getResourceAsStream("connection.properties");
 		Properties properties = new Properties();
 		properties.load(inputStream);
 		host = properties.getProperty("host");
 		port = Integer.parseInt(properties.getProperty("port"));
-		workspacesDirectory = Long.parseLong(properties
-				.getProperty("workspacesDir"));
+		workspacesDirectory = Long.parseLong(properties.getProperty("workspacesDir"));
 		collectionId = Long.parseLong(properties.getProperty("collectionId"));
 	}
 
@@ -107,14 +111,13 @@ public class FlowTests
 		throws Exception
 	{
 		userId = "test-" + new Date().getTime();
-		dl = new DLibraDataSource(host, port, workspacesDirectory,
-				collectionId, ADMIN_ID, ADMIN_PASSWORD);
+		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
 		dl.createUser(userId, USER_PASSWORD, USERNAME);
-		dl = new DLibraDataSource(host, port, workspacesDirectory,
-				collectionId, userId, USER_PASSWORD);
+		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
 		dl.createWorkspace("w");
 		dl.createResearchObject("w", "r");
-		dl.createVersion("w", "r", "v");
+		dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+			MAIN_FILE_MIME_TYPE);
 
 		files[0] = new FileRecord("file1.txt", "file1.txt", "text/plain");
 		files[1] = new FileRecord("file2.txt", "dir/file2.txt", "text/plain");
@@ -129,19 +132,16 @@ public class FlowTests
 	public void tearDown()
 		throws Exception
 	{
-		dl = new DLibraDataSource(host, port, workspacesDirectory,
-				collectionId, userId, USER_PASSWORD);
+		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
 		dl.deleteWorkspace("w");
-		dl = new DLibraDataSource(host, port, workspacesDirectory,
-				collectionId, ADMIN_ID, ADMIN_PASSWORD);
+		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
 		dl.deleteUser(userId);
 	}
 
 
 	@Test
 	public final void testAddingResources()
-		throws DigitalLibraryException, IOException, NotFoundException,
-		ConflictException, AccessDeniedException
+		throws DigitalLibraryException, IOException, NotFoundException, ConflictException, AccessDeniedException
 	{
 		createOrUpdateFile(files[0]);
 		createOrUpdateFile(files[1]);
@@ -161,8 +161,7 @@ public class FlowTests
 
 	@Test
 	public final void testEmptyDirectory()
-		throws DigitalLibraryException, IOException, NotFoundException,
-		AccessDeniedException
+		throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException
 	{
 		createOrUpdateDirectory(directories[1]);
 		getZippedFolder(directories[1]);
@@ -176,8 +175,7 @@ public class FlowTests
 
 	@Test
 	public final void testEditions()
-		throws DigitalLibraryException, IOException, NotFoundException,
-		AccessDeniedException
+		throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException
 	{
 		long edId1 = createEdition();
 		createOrUpdateFile(files[0]);
@@ -207,13 +205,11 @@ public class FlowTests
 
 	@Test
 	public final void testPermissions()
-		throws DigitalLibraryException, IOException, NotFoundException,
-		ConflictException, DLibraException
+		throws DigitalLibraryException, IOException, NotFoundException, ConflictException, DLibraException
 	{
 		createOrUpdateFile(files[0]);
 		createOrUpdateFile(files[1]);
-		dl = new DLibraDataSource(host, port, workspacesDirectory,
-				collectionId, READER_LOGIN, READER_PASSWORD);
+		dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, READER_LOGIN, READER_PASSWORD);
 		getFileContent(files[0]);
 		getFileContent(files[1]);
 		checkCantCreateOrUpdateFile(files[0]);
@@ -303,7 +299,8 @@ public class FlowTests
 	private void createVersionAsCopy()
 		throws DigitalLibraryException, NotFoundException, ConflictException
 	{
-		dl.createVersion(w, r, v2);
+		dl.createVersion(w, r, v2, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+			MAIN_FILE_MIME_TYPE);
 	}
 
 
@@ -322,8 +319,7 @@ public class FlowTests
 		InputStream f = dl.getFileContents(w, r, v, file.path, edId);
 		assertNotNull(f);
 		f.close();
-		assertEquals(file.mimeType,
-			dl.getFileMimeType(w, r, v, file.path, edId));
+		assertEquals(file.mimeType, dl.getFileMimeType(w, r, v, file.path, edId));
 	}
 
 
@@ -346,12 +342,10 @@ public class FlowTests
 
 
 	private void createOrUpdateFile(FileRecord file)
-		throws DigitalLibraryException, IOException, NotFoundException,
-		AccessDeniedException
+		throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException
 	{
 		InputStream f = file.open();
-		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, file.path, f,
-			file.mimeType);
+		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, file.path, f, file.mimeType);
 		f.close();
 		assertNotNull(r1);
 	}
@@ -376,11 +370,9 @@ public class FlowTests
 
 
 	private void createOrUpdateDirectory(String path)
-		throws DigitalLibraryException, IOException, NotFoundException,
-		AccessDeniedException
+		throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException
 	{
-		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, path,
-			new ByteArrayInputStream(new byte[0]), "text/plain");
+		ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, path, new ByteArrayInputStream(new byte[0]), "text/plain");
 		assertNotNull(r1);
 	}
 

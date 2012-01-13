@@ -38,13 +38,11 @@ import com.google.common.collect.Multimap;
 public class AttributesHelper
 {
 
-	private final static Logger logger = Logger
-			.getLogger(AttributesHelper.class);
+	private final static Logger logger = Logger.getLogger(AttributesHelper.class);
 
 	public static final String ATTRIBUTE_LANGUAGE = Language.UNIVERSAL;
 
-	public static final SimpleDateFormat SDF = new SimpleDateFormat(
-			"yyyy.MM.dd HH:mm:ss z");
+	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss z");
 
 	private final DLibraDataSource dl;
 
@@ -55,49 +53,41 @@ public class AttributesHelper
 	}
 
 
-	public void storeAttributes(String workspaceId, String researchObjectId,
-			String versionId, Multimap<URI, Object> attributes)
+	public void storeAttributes(String workspaceId, String researchObjectId, String versionId,
+			Multimap<URI, Object> attributes)
 		throws RemoteException, IdNotFoundException, DLibraException
 	{
-		AttributeValueSet avs = getAttributeValueSet(workspaceId,
-			researchObjectId, versionId);
+		AttributeValueSet avs = getAttributeValueSet(workspaceId, researchObjectId, versionId);
 		for (URI uri : attributes.keySet()) {
-			updateAttribute(avs, uri.toString(), attributes.get(uri));
+			updateAttribute(avs, uri, attributes.get(uri));
 		}
 		commitAttributeValueSet(avs);
 	}
 
 
-	private AttributeValueSet getAttributeValueSet(String workspaceId,
-			String researchObjectId, String versionId)
+	private AttributeValueSet getAttributeValueSet(String workspaceId, String researchObjectId, String versionId)
 		throws RemoteException, DLibraException, IdNotFoundException
 	{
-		EditionId editionId = dl.getEditionHelper().getLastEditionId(
-			researchObjectId, versionId);
+		EditionId editionId = dl.getEditionHelper().getLastEditionId(researchObjectId, versionId);
 
-		AttributeValueSet avs = dl.getMetadataServer()
-				.getElementMetadataManager()
+		AttributeValueSet avs = dl.getMetadataServer().getElementMetadataManager()
 				.getAttributeValueSet(editionId, AttributeValue.AV_ASSOC_ALL);
 		return avs;
 	}
 
 
 	private void commitAttributeValueSet(AttributeValueSet avs)
-		throws RemoteException, IdNotFoundException, AccessDeniedException,
-		DLibraException
+		throws RemoteException, IdNotFoundException, AccessDeniedException, DLibraException
 	{
-		dl.getMetadataServer().getElementMetadataManager()
-				.setAttributeValueSet(avs);
+		dl.getMetadataServer().getElementMetadataManager().setAttributeValueSet(avs);
 	}
 
 
-	private void updateAttribute(AttributeValueSet avs,
-			String attributeRdfName, Collection<Object> values)
+	private void updateAttribute(AttributeValueSet avs, URI attributeRdfName, Collection<Object> values)
 		throws IdNotFoundException, RemoteException, DLibraException
 	{
 		if (values.isEmpty()) {
-			logger.warn(String.format("Ignoring empty value for attribute %s",
-				attributeRdfName));
+			logger.warn(String.format("Ignoring empty value for attribute %s", attributeRdfName));
 			return;
 		}
 
@@ -111,7 +101,7 @@ public class AttributesHelper
 			// create attribute value
 			AttributeValue attValue = new AttributeValue(null);
 			attValue.setAttributeId(attributeInfo.getId());
-			//TODO not always toString, for example Calendar needs to be nicely printed
+			// TODO not always toString, for example Calendar needs to be nicely printed
 			String s = null;
 			if (o instanceof Calendar) {
 				s = SDF.format(((Calendar) o).getTime());
@@ -128,13 +118,10 @@ public class AttributesHelper
 		}
 
 		// update attribute value set
-		avs.setDirectAttributeValues(attributeInfo.getId(), ATTRIBUTE_LANGUAGE,
-			attValues);
+		avs.setDirectAttributeValues(attributeInfo.getId(), ATTRIBUTE_LANGUAGE, attValues);
 
-		logger.debug(String.format(
-			"Updated attribute %s (%d) with %d values such as %s",
-			attributeInfo.getRDFName(), attributeInfo.getId().getId(),
-			values.size(), values.iterator().next().toString()));
+		logger.debug(String.format("Updated attribute %s (%d) with %d values such as %s", attributeInfo.getRDFName(),
+			attributeInfo.getId().getId(), values.size(), values.iterator().next().toString()));
 	}
 
 
@@ -145,12 +132,17 @@ public class AttributesHelper
 	 * @throws RemoteException
 	 * @throws DLibraException
 	 */
-	private AttributeInfo getAttribute(String attributeRdfName)
+	private AttributeInfo getAttribute(URI attributeRdfName)
 		throws IdNotFoundException, RemoteException, DLibraException
 	{
-		AttributeInfo attributeInfo = findExistingAttribute(attributeRdfName);
+		AttributeInfo attributeInfo = findExistingAttribute(attributeRdfName.toString());
 		if (attributeInfo == null) {
-			attributeInfo = createAttribute(attributeRdfName);
+			String name;
+			if (attributeRdfName.getFragment() != null)
+				name = attributeRdfName.getFragment();
+			else
+				name = attributeRdfName.resolve(".").relativize(attributeRdfName).toString();
+			attributeInfo = createAttribute(attributeRdfName.toString(), name);
 		}
 		return attributeInfo;
 	}
@@ -169,14 +161,11 @@ public class AttributesHelper
 		CollectionResult result = dl
 				.getMetadataServer()
 				.getAttributeManager()
-				.getObjects(
-					new AttributeFilter((AttributeId) null).setRDFNames(Arrays
-							.asList(attributeRdfName)),
+				.getObjects(new AttributeFilter((AttributeId) null).setRDFNames(Arrays.asList(attributeRdfName)),
 					new OutputFilter(AttributeInfo.class));
 		if (result.getResultsCount() > 1) {
-			logger.debug(String.format(
-				"Found %d attributes with RDF name '%s'",
-				result.getResultsCount(), attributeRdfName));
+			logger.debug(String.format("Found %d attributes with RDF name '%s'", result.getResultsCount(),
+				attributeRdfName));
 			return (AttributeInfo) result.getResultInfos().iterator().next();
 		}
 		else if (result.getResultsCount() == 1) {
@@ -187,67 +176,63 @@ public class AttributesHelper
 	}
 
 
-	private AttributeInfo createAttribute(String attributeRdfName)
-		throws UnsupportedOperationException, IdNotFoundException,
-		RemoteException, DLibraException
+	private AttributeInfo createAttribute(String attributeRdfName, String name)
+		throws UnsupportedOperationException, IdNotFoundException, RemoteException, DLibraException
 	{
-		AttributeManager attributeManager = dl.getMetadataServer()
-				.getAttributeManager();
+		AttributeManager attributeManager = dl.getMetadataServer().getAttributeManager();
 		Attribute att = new Attribute(null);
 		att.setLanguageName("pl");
-		att.setName(attributeRdfName);
+		att.setName(name);
 		att.setLanguageName("en");
-		att.setName(attributeRdfName);
+		att.setName(name);
 		att.setLanguageName(ATTRIBUTE_LANGUAGE);
 		att.setRDFName(attributeRdfName);
 		AttributeId id = attributeManager.addAttribute(att);
 		att.setId(id);
-		logger.debug(String.format("Created a new attribute with RDF name %s",
-			att.getRDFName()));
+		logger.debug(String.format("Created a new attribute with RDF name %s", att.getRDFName()));
 		return (AttributeInfo) att.getInfo();
 	}
 
 
 	/**
-	* Adds attribute value specified by text value. Chooses one from system
-	* or creates a new one if such value does not exist.
-	* @param value Text specifying value.
-	* @return attribute value
-	* @throws RemoteException in case remote server exception occurred.
-	* @throws IdNotFoundException in case there was a problem with identifiers.
-	* @throws DLibraException
-	* @throws RemoteException
-	* @throws OperationFailedException
-	* @throws DuplicatedValueException when new group cannot be created
-	* because of name conflict (may occur when concurrent modifications are
-	* performed).
-	* @throws AccessDeniedException when there is no access
-	* to perform adding new group operation.
-	*/
+	 * Adds attribute value specified by text value. Chooses one from system or creates a
+	 * new one if such value does not exist.
+	 * 
+	 * @param value
+	 *            Text specifying value.
+	 * @return attribute value
+	 * @throws RemoteException
+	 *             in case remote server exception occurred.
+	 * @throws IdNotFoundException
+	 *             in case there was a problem with identifiers.
+	 * @throws DLibraException
+	 * @throws RemoteException
+	 * @throws OperationFailedException
+	 * @throws DuplicatedValueException
+	 *             when new group cannot be created because of name conflict (may occur
+	 *             when concurrent modifications are performed).
+	 * @throws AccessDeniedException
+	 *             when there is no access to perform adding new group operation.
+	 */
 	private AttributeValue createAttributeValue(final AttributeValue value)
 		throws RemoteException, DLibraException
 	{
-		AttributeValueManager attributeValueManager = dl.getMetadataServer()
-				.getAttributeValueManager();
+		AttributeValueManager attributeValueManager = dl.getMetadataServer().getAttributeValueManager();
 		List<AttributeValue> groupsWithValue = new ArrayList<AttributeValue>();
 		for (DLObject obj : attributeValueManager.getObjects(
-			new AttributeValueFilter(value.getAttributeId()).setValue(
-				value.getValue(), true)
-					.setLanguageName(value.getLanguageName()),
-			new OutputFilter(AttributeValue.class)).getResults())
+			new AttributeValueFilter(value.getAttributeId()).setValue(value.getValue(), true).setLanguageName(
+				value.getLanguageName()), new OutputFilter(AttributeValue.class)).getResults())
 			groupsWithValue.add((AttributeValue) obj);
 		if (groupsWithValue.isEmpty()) {
 			logger.debug("No groups with value " + value);
-			AttributeValueId id = attributeValueManager
-					.addAttributeValue(value);
+			AttributeValueId id = attributeValueManager.addAttributeValue(value);
 			value.setId(id);
 			return value;
 		}
 		else if (groupsWithValue.size() == 1) {
 			AttributeValue group = groupsWithValue.get(0);
 			if (group != null) {
-				return getAttributeValueFromGroup(value.getValue(), group,
-					value.getLanguageName());
+				return getAttributeValueFromGroup(value.getValue(), group, value.getLanguageName());
 			}
 		}
 		else {
@@ -257,16 +242,13 @@ public class AttributesHelper
 	}
 
 
-	private AttributeValue getAttributeValueFromGroup(String value,
-			AttributeValue group, String selLang)
+	private AttributeValue getAttributeValueFromGroup(String value, AttributeValue group, String selLang)
 		throws RemoteException, IdNotFoundException, DLibraException
 
 	{
-		Collection<DLObject> groupValues = dl
-				.getMetadataServer()
-				.getAttributeValueManager()
-				.getObjects(new AttributeValueFilter(null, group.getId()),
-					new OutputFilter(AttributeValue.class)).getResults();
+		Collection<DLObject> groupValues = dl.getMetadataServer().getAttributeValueManager()
+				.getObjects(new AttributeValueFilter(null, group.getId()), new OutputFilter(AttributeValue.class))
+				.getResults();
 		AttributeValue foundValue = null;
 		boolean eqIgnCase = false;
 		for (Iterator<DLObject> iter = groupValues.iterator(); iter.hasNext();) {
@@ -284,11 +266,10 @@ public class AttributesHelper
 			return foundValue;
 		}
 		if (eqIgnCase) {
-			//FIXME: what to throw?
+			// FIXME: what to throw?
 		}
-		throw new IdNotFoundException("Could not find value in group. Value: "
-				+ value + " Group id: " + group.getBaseId()
-				+ " Language name: " + selLang);
+		throw new IdNotFoundException("Could not find value in group. Value: " + value + " Group id: "
+				+ group.getBaseId() + " Language name: " + selLang);
 	}
 
 }
