@@ -179,6 +179,8 @@ public class AttributesHelper
 	private AttributeInfo createAttribute(String attributeRdfName, String name)
 		throws UnsupportedOperationException, IdNotFoundException, RemoteException, DLibraException
 	{
+		// this is to use localName of properties
+		attributeRdfName = name;
 		AttributeManager attributeManager = dl.getMetadataServer().getAttributeManager();
 		Attribute att = new Attribute(null);
 		att.setLanguageName("pl");
