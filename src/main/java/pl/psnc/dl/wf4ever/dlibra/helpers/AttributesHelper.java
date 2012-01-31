@@ -149,17 +149,16 @@ public class AttributesHelper
 	private AttributeInfo getAttribute(URI attributeRdfName)
 		throws IdNotFoundException, RemoteException, DLibraException
 	{
-		AttributeInfo attributeInfo = findExistingAttribute(attributeRdfName
-				.toString());
+		String name;
+		if (attributeRdfName.getFragment() != null)
+			name = attributeRdfName.getFragment();
+		else
+			name = attributeRdfName.resolve(".").relativize(attributeRdfName)
+					.toString();
+		name = StringUtils.capitalize(name);
+		AttributeInfo attributeInfo = findExistingAttribute(name);
 		if (attributeInfo == null) {
-			String name;
-			if (attributeRdfName.getFragment() != null)
-				name = attributeRdfName.getFragment();
-			else
-				name = attributeRdfName.resolve(".")
-						.relativize(attributeRdfName).toString();
-			name = StringUtils.capitalize(name);
-			attributeInfo = createAttribute(attributeRdfName.toString(), name);
+			attributeInfo = createAttribute(name, name);
 		}
 		return attributeInfo;
 	}
@@ -200,8 +199,6 @@ public class AttributesHelper
 		throws UnsupportedOperationException, IdNotFoundException,
 		RemoteException, DLibraException
 	{
-		// this is to use localName of properties
-		attributeRdfName = name;
 		AttributeManager attributeManager = dl.getMetadataServer()
 				.getAttributeManager();
 		Attribute att = new Attribute(null);

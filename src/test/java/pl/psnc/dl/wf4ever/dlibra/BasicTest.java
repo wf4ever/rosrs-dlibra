@@ -3,9 +3,11 @@
  */
 package pl.psnc.dl.wf4ever.dlibra;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -16,6 +18,7 @@ import java.util.Properties;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -104,17 +107,14 @@ public class BasicTest
 	 * .
 	 * 
 	 * @throws DLibraException
-	 * @throws UnknownHostException
-	 * @throws MalformedURLException
-	 * @throws RemoteException
 	 * @throws DigitalLibraryException
 	 * @throws ConflictException
 	 * @throws NotFoundException
+	 * @throws IOException
 	 */
 	@Test
 	public final void testCreateVersionStringStringStringURI()
-		throws RemoteException, MalformedURLException, UnknownHostException, DLibraException, DigitalLibraryException,
-		NotFoundException, ConflictException
+		throws DLibraException, DigitalLibraryException, NotFoundException, ConflictException, IOException
 	{
 		DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
 				ADMIN_PASSWORD);
@@ -125,6 +125,8 @@ public class BasicTest
 		dl.createResearchObject("w", "r");
 		dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
 			MAIN_FILE_MIME_TYPE);
+		String file = IOUtils.toString(dl.getFileContents("w", "r", "v", MAIN_FILE_PATH));
+		assertEquals("Manifest is properly saved", MAIN_FILE_CONTENT, file);
 	}
 
 

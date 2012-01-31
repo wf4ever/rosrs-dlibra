@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import pl.psnc.dlibra.common.Info;
@@ -46,7 +47,6 @@ import pl.psnc.dlibra.service.DuplicatedValueException;
 import pl.psnc.dlibra.service.IdNotFoundException;
 import pl.psnc.dlibra.user.User;
 import pl.psnc.dlibra.user.UserManager;
-import pl.psnc.util.IOUtils;
 
 /**
  * @author piotrhol
@@ -293,10 +293,16 @@ public class PublicationsHelper
 	{
 		Date creationDate = new Date();
 
-		File mainFile = new File(mainFileMimeType, publicationId, mainFilePath);
+		File mainFile = new File(mainFileMimeType, publicationId, "/" + mainFilePath);
 		Version createdVersion = fileManager.createVersion(mainFile, 0, creationDate, "");
 		OutputStream output = dLibra.getContentServer().getVersionOutputStream(createdVersion.getId());
-		IOUtils.copyStream(mainFileContent, output);
+		try {
+			IOUtils.copy(mainFileContent, output);
+		}
+		finally {
+			mainFileContent.close();
+			output.close();
+		}
 
 		publicationManager.setMainFile(publicationId, createdVersion.getFileId());
 
