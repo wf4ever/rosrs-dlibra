@@ -52,8 +52,10 @@ public class UserProfile
 	public static URI generateAbsoluteURI(URI uri, String login)
 	{
 		if (uri == null) {
-			uri = URI.create(login);
-			if (uri == null) {
+			try {
+				uri = new URI(login);
+			}
+			catch (URISyntaxException e2) {
 				try {
 					uri = new URI(null, login, null);
 				}
