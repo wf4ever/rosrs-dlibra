@@ -4,6 +4,8 @@
 package pl.psnc.dl.wf4ever.dlibra;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
@@ -118,7 +120,7 @@ public class BasicTest
 	{
 		DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
 				ADMIN_PASSWORD);
-		dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
+		assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
 		DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
 				USER_PASSWORD);
 		dl.createWorkspace("w");
@@ -137,7 +139,8 @@ public class BasicTest
 	{
 		DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
 				ADMIN_PASSWORD);
-		dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
+		assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
+		assertFalse(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
 		DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
 				USER_PASSWORD);
 		UserProfile user = dl.getUserProfile();

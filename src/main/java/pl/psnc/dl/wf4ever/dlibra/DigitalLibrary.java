@@ -93,7 +93,7 @@ public interface DigitalLibrary
 		throws DigitalLibraryException, NotFoundException;
 
 
-	public void createUser(String userId, String password, String username)
+	public boolean createUser(String userId, String password, String username)
 		throws DigitalLibraryException, NotFoundException, ConflictException;
 
 
