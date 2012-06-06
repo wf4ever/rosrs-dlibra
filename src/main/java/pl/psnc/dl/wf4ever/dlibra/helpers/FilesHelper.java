@@ -154,7 +154,7 @@ public class FilesHelper {
      * @throws RemoteException
      * @throws DLibraException
      */
-    public InputStream getZippedFolder(EditionId editionId, String folderNotStandardized)
+    public InputStream getZippedFolder(final EditionId editionId, String folderNotStandardized)
             throws RemoteException, DLibraException {
         final String folder = (folderNotStandardized == null ? null
                 : (folderNotStandardized.endsWith("/") ? folderNotStandardized : folderNotStandardized.concat("/")));
@@ -180,10 +180,16 @@ public class FilesHelper {
                         String filePath = mapEntry.getValue().getFullPath().substring(1);
                         ZipEntry entry = new ZipEntry(filePath);
                         zipOut.putNextEntry(entry);
+                        logger.debug("Creating a version input stream for " + versionId.toString() + " edition "
+                                + editionId.toString());
                         InputStream versionInputStream = contentServer.getVersionInputStream(versionId);
+                        logger.debug("Created a version input stream for " + versionId.toString());
                         try {
+                            logger.debug("Start copying stream for " + versionId.toString());
                             IOUtils.copyStream(versionInputStream, zipOut);
+                            logger.debug("Finished copying stream for " + versionId.toString());
                         } finally {
+                            logger.debug("Closing stream for " + versionId.toString());
                             versionInputStream.close();
                         }
                     }
@@ -214,6 +220,8 @@ public class FilesHelper {
         VersionId versionId = getVersionId(editionId, filePath);
 
         InputStream versionInputStream = contentServer.getVersionInputStream(versionId);
+        logger.debug("Returning a version stream for version Id " + versionId.toString() + " edition Id "
+                + editionId.toString());
         return versionInputStream;
     }
 
