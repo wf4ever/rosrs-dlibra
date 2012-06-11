@@ -7,55 +7,50 @@ import java.util.Date;
 
 /**
  * @author piotrek
- *
+ * 
  */
-public class Snapshot
-{
+public class Snapshot {
 
-	private final long id;
+    private final long id;
 
-	private final boolean published;
+    private final boolean published;
 
-	private final Date creationDate;
-
-
-	/**
-	 * @param id
-	 * @param published
-	 * @param creationDate
-	 */
-	public Snapshot(long id, boolean published, Date creationDate)
-	{
-		this.id = id;
-		this.published = published;
-		this.creationDate = creationDate;
-	}
+    private final Date creationDate;
 
 
-	/**
-	 * @return the id
-	 */
-	public long getId()
-	{
-		return id;
-	}
+    /**
+     * @param id
+     * @param published
+     * @param creationDate
+     */
+    public Snapshot(long id, boolean published, Date creationDate) {
+        this.id = id;
+        this.published = published;
+        this.creationDate = creationDate;
+    }
 
 
-	/**
-	 * @return the published
-	 */
-	public boolean isPublished()
-	{
-		return published;
-	}
+    /**
+     * @return the id
+     */
+    public long getId() {
+        return id;
+    }
 
 
-	/**
-	 * @return the creationDate
-	 */
-	public Date getCreationDate()
-	{
-		return creationDate;
-	}
+    /**
+     * @return the published
+     */
+    public boolean isPublished() {
+        return published;
+    }
+
+
+    /**
+     * @return the creationDate
+     */
+    public Date getCreationDate() {
+        return creationDate;
+    }
 
 }

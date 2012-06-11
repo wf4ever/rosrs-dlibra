@@ -9,25 +9,21 @@ import pl.psnc.dlibra.service.IdNotFoundException;
  * @author piotrek
  * 
  */
-public class NotFoundException
-	extends Exception
-{
+public class NotFoundException extends Exception {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3060338267583511733L;
+    private static final long serialVersionUID = -3060338267583511733L;
 
 
-	public NotFoundException(String message)
-	{
-		super(message);
-	}
+    public NotFoundException(String message) {
+        super(message);
+    }
 
 
-	public NotFoundException(IdNotFoundException e)
-	{
-		this(String.format("%s (%s)", e.getMessage(), e.getNotFoundId()));
-	}
+    public NotFoundException(IdNotFoundException e) {
+        this(String.format("%s (%s)", e.getMessage(), e.getNotFoundId()));
+    }
 
 }

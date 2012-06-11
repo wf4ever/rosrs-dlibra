@@ -35,171 +35,160 @@ import pl.psnc.dlibra.user.UserServer;
  * @author piotrhol
  * 
  */
-public class UsersHelper
-{
+public class UsersHelper {
 
-	private final DLibraDataSource dLibra;
+    private final DLibraDataSource dLibra;
 
-	private final DirectoryManager directoryManager;
+    private final DirectoryManager directoryManager;
 
-	private final UserServiceResolver serviceResolver;
+    private final UserServiceResolver serviceResolver;
 
-	private final UserManager userManager;
-
-
-	public UsersHelper(DLibraDataSource dLibraDataSource)
-		throws RemoteException
-	{
-		this.dLibra = dLibraDataSource;
-
-		directoryManager = dLibraDataSource.getMetadataServer().getDirectoryManager();
-		serviceResolver = dLibraDataSource.getServiceResolver();
-		userManager = dLibraDataSource.getUserManager();
-	}
+    private final UserManager userManager;
 
 
-	/**
-	 * Creates user in dLibra, equivalent to workspace in ROSRS.
-	 * 
-	 * @param login
-	 * @param password
-	 * @param username
-	 * @return
-	 * @throws RemoteException
-	 * @throws DLibraException
-	 */
-	public boolean createUser(String login, String password, String username)
-		throws RemoteException, DLibraException
-	{
-		// check if user already exists
-		boolean created;
-		User user;
-		UserId userId;
-		try {
-			user = userManager.getUserData(login);
-			created = false;
-		}
-		catch (IdNotFoundException e) {
-			user = new User(username);
-			created = true;
-		}
+    public UsersHelper(DLibraDataSource dLibraDataSource)
+            throws RemoteException {
+        this.dLibra = dLibraDataSource;
 
-		DirectoryId workspaceDir = createDirectory(login);
-
-		user.setPassword(password);
-		user.setHomedir(workspaceDir);
-		user.setType(Actor.USER);
-		user.setLogin(login);
-		user.setEmail(login);
-
-		if (created) {
-			userId = userManager.createUser(user);
-		}
-		else {
-			userManager.setUserData(user);
-			userId = user.getId();
-		}
-
-		List<ActorId> usersWithRead = Arrays.asList(userId, getPublicUserId());
-
-		UserServer userServer = DLStaticServiceResolver.getUserServer(serviceResolver, null);
-		userServer.getRightManager().setDirectoryRights(workspaceDir, Arrays.asList((ActorId) userId),
-			new RightOperation(DirectoryRightId.PUBLICATION_MGMT, RightOperation.ADD));
-		// directory access rights
-		userServer.getRightManager().setDirectoryRights(DLibraDataSource.ROOT_DIRECTORY_ID, usersWithRead,
-			new RightOperation(DirectoryRightId.DIRECTORY_ACCESS, RightOperation.ADD));
-		userServer.getRightManager().setDirectoryRights(dLibra.getWorkspacesContainerDirectoryId(), usersWithRead,
-			new RightOperation(DirectoryRightId.DIRECTORY_ACCESS, RightOperation.ADD));
-		userServer.getRightManager().setDirectoryRights(workspaceDir, usersWithRead,
-			new RightOperation(DirectoryRightId.DIRECTORY_ACCESS, RightOperation.ADD));
-		// add to collection
-		userServer.getRightManager().setLibCollectionRights(dLibra.getCollectionId(), Arrays.asList((ActorId) userId),
-			new RightOperation(LibCollectionRightId.COLLECTION_CONTENT_MGMT, RightOperation.ADD));
-		// modify attributes
-		userServer.getRightManager().setLibraryRights(usersWithRead,
-			new RightOperation(LibraryRightId.ATTRIBUTES_MGMT, RightOperation.ADD));
-		return created;
-	}
+        directoryManager = dLibraDataSource.getMetadataServer().getDirectoryManager();
+        serviceResolver = dLibraDataSource.getServiceResolver();
+        userManager = dLibraDataSource.getUserManager();
+    }
 
 
-	private DirectoryId createDirectory(String name)
-		throws RemoteException, DLibraException
-	{
-		MetadataServer metadataServer = DLStaticServiceResolver.getMetadataServer(serviceResolver, null);
-		Directory directory = new Directory(null, dLibra.getWorkspacesContainerDirectoryId());
-		for (String language : metadataServer.getLanguageManager().getLanguageNames(Language.LAN_INTERFACE)) {
-			directory.setLanguageName(language);
-			directory.setName(name);
-		}
-		return directoryManager.createDirectory(directory);
-	}
+    /**
+     * Creates user in dLibra, equivalent to workspace in ROSRS.
+     * 
+     * @param login
+     * @param password
+     * @param username
+     * @return
+     * @throws RemoteException
+     * @throws DLibraException
+     */
+    public boolean createUser(String login, String password, String username)
+            throws RemoteException, DLibraException {
+        // check if user already exists
+        boolean created;
+        User user;
+        UserId userId;
+        try {
+            user = userManager.getUserData(login);
+            created = false;
+        } catch (IdNotFoundException e) {
+            user = new User(username);
+            created = true;
+        }
+
+        DirectoryId workspaceDir = createDirectory(login);
+
+        user.setPassword(password);
+        user.setHomedir(workspaceDir);
+        user.setType(Actor.USER);
+        user.setLogin(login);
+        user.setEmail(login);
+
+        if (created) {
+            userId = userManager.createUser(user);
+        } else {
+            userManager.setUserData(user);
+            userId = user.getId();
+        }
+
+        List<ActorId> usersWithRead = Arrays.asList(userId, getPublicUserId());
+
+        UserServer userServer = DLStaticServiceResolver.getUserServer(serviceResolver, null);
+        userServer.getRightManager().setDirectoryRights(workspaceDir, Arrays.asList((ActorId) userId),
+            new RightOperation(DirectoryRightId.PUBLICATION_MGMT, RightOperation.ADD));
+        // directory access rights
+        userServer.getRightManager().setDirectoryRights(DLibraDataSource.ROOT_DIRECTORY_ID, usersWithRead,
+            new RightOperation(DirectoryRightId.DIRECTORY_ACCESS, RightOperation.ADD));
+        userServer.getRightManager().setDirectoryRights(dLibra.getWorkspacesContainerDirectoryId(), usersWithRead,
+            new RightOperation(DirectoryRightId.DIRECTORY_ACCESS, RightOperation.ADD));
+        userServer.getRightManager().setDirectoryRights(workspaceDir, usersWithRead,
+            new RightOperation(DirectoryRightId.DIRECTORY_ACCESS, RightOperation.ADD));
+        // add to collection
+        userServer.getRightManager().setLibCollectionRights(dLibra.getCollectionId(), Arrays.asList((ActorId) userId),
+            new RightOperation(LibCollectionRightId.COLLECTION_CONTENT_MGMT, RightOperation.ADD));
+        // modify attributes
+        userServer.getRightManager().setLibraryRights(usersWithRead,
+            new RightOperation(LibraryRightId.ATTRIBUTES_MGMT, RightOperation.ADD));
+        return created;
+    }
 
 
-	/**
-	 * Deletes user from dLibra, equivalent to workspace in ROSRS.
-	 * 
-	 * @param login
-	 * @throws RemoteException
-	 * @throws DLibraException
-	 */
-	public void deleteUser(String login)
-		throws RemoteException, DLibraException
-	{
-		// TODO do we really want to permanently remove the user and its
-		// directory?
-
-		User userData = userManager.getUserData(login);
-
-		directoryManager.removeDirectory(userData.getHomedir(), true, "Workspace removed from RO SRS");
-
-		userManager.removeUser(userData.getId());
-	}
+    private DirectoryId createDirectory(String name)
+            throws RemoteException, DLibraException {
+        MetadataServer metadataServer = DLStaticServiceResolver.getMetadataServer(serviceResolver, null);
+        Directory directory = new Directory(null, dLibra.getWorkspacesContainerDirectoryId());
+        for (String language : metadataServer.getLanguageManager().getLanguageNames(Language.LAN_INTERFACE)) {
+            directory.setLanguageName(language);
+            directory.setName(name);
+        }
+        return directoryManager.createDirectory(directory);
+    }
 
 
-	public boolean userExists(String login)
-		throws RemoteException, DLibraException
-	{
-		try {
-			userManager.getUserData(login);
-			return true;
-		}
-		catch (IdNotFoundException e) {
-			return false;
-		}
-	}
+    /**
+     * Deletes user from dLibra, equivalent to workspace in ROSRS.
+     * 
+     * @param login
+     * @throws RemoteException
+     * @throws DLibraException
+     */
+    public void deleteUser(String login)
+            throws RemoteException, DLibraException {
+        // TODO do we really want to permanently remove the user and its
+        // directory?
+
+        User userData = userManager.getUserData(login);
+
+        directoryManager.removeDirectory(userData.getHomedir(), true, "Workspace removed from RO SRS");
+
+        userManager.removeUser(userData.getId());
+    }
 
 
-	/**
-	 * @param id
-	 * @throws RemoteException
-	 * @throws DLibraException
-	 * @throws IdNotFoundException
-	 * @throws AccessDeniedException
-	 * @throws UnavailableServiceException
-	 */
-	public void grantReadAccessToPublication(PublicationId id)
-		throws RemoteException, DLibraException, IdNotFoundException, AccessDeniedException,
-		UnavailableServiceException
-	{
-		ActorId publicUserId = getPublicUserId();
-
-		DLStaticServiceResolver
-				.getUserServer(serviceResolver, null)
-				.getRightManager()
-				.setPublicationRights(id, Arrays.asList(publicUserId),
-					new RightOperation(PublicationRightId.PUBLICATION_READ, true, RightOperation.ADD));
-	}
+    public boolean userExists(String login)
+            throws RemoteException, DLibraException {
+        try {
+            userManager.getUserData(login);
+            return true;
+        } catch (IdNotFoundException e) {
+            return false;
+        }
+    }
 
 
-	/**
-	 * @return
-	 * @throws RemoteException
-	 * @throws DLibraException
-	 */
-	private ActorId getPublicUserId()
-		throws RemoteException, DLibraException
-	{
-		return userManager.getActorId("wf4ever_reader");
-	}
+    /**
+     * @param id
+     * @throws RemoteException
+     * @throws DLibraException
+     * @throws IdNotFoundException
+     * @throws AccessDeniedException
+     * @throws UnavailableServiceException
+     */
+    public void grantReadAccessToPublication(PublicationId id)
+            throws RemoteException, DLibraException, IdNotFoundException, AccessDeniedException,
+            UnavailableServiceException {
+        ActorId publicUserId = getPublicUserId();
+
+        DLStaticServiceResolver
+                .getUserServer(serviceResolver, null)
+                .getRightManager()
+                .setPublicationRights(id, Arrays.asList(publicUserId),
+                    new RightOperation(PublicationRightId.PUBLICATION_READ, true, RightOperation.ADD));
+    }
+
+
+    /**
+     * @return
+     * @throws RemoteException
+     * @throws DLibraException
+     */
+    private ActorId getPublicUserId()
+            throws RemoteException, DLibraException {
+        return userManager.getActorId("wf4ever_reader");
+    }
 
 }
