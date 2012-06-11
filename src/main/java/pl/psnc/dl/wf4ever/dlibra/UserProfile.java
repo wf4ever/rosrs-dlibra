@@ -9,36 +9,59 @@ import java.net.URISyntaxException;
 import org.apache.log4j.Logger;
 
 /**
+ * RODL user model.
+ * 
  * @author piotrhol
  * 
  */
 public class UserProfile {
 
+    /** Simple user privileges model. */
     public enum Role {
+        /** Can do everything in RODL. */
         ADMIN,
+        /** Can manipulate his own resources. */
         AUTHENTICATED,
+        /** Anyone else. */
         PUBLIC
     }
 
 
-    private final static Logger logger = Logger.getLogger(UserProfile.class);
+    /** Logger. */
+    private static final Logger LOG = Logger.getLogger(UserProfile.class);
 
+    /** User login. */
     private final String login;
 
+    /** User password. */
     private final String password;
 
+    /** Nice name. */
     private final String name;
 
+    /** Role. */
     private final Role role;
 
+    /** User URI. */
     private final URI uri;
 
+    /** User homepage. */
     private URI homePage;
 
 
     /**
+     * Constructor.
+     * 
      * @param login
+     *            login
+     * @param password
+     *            password
      * @param name
+     *            name
+     * @param role
+     *            role
+     * @param uri
+     *            uri
      */
     public UserProfile(String login, String password, String name, Role role, URI uri) {
         super();
@@ -50,6 +73,32 @@ public class UserProfile {
     }
 
 
+    /**
+     * Constructor.
+     * 
+     * @param login
+     *            login
+     * @param password
+     *            password
+     * @param name
+     *            name
+     * @param role
+     *            role
+     */
+    public UserProfile(String login, String password, String name, Role role) {
+        this(login, password, name, role, null);
+    }
+
+
+    /**
+     * Create an absolute URI.
+     * 
+     * @param uri
+     *            user URI, may be null
+     * @param login
+     *            user login, may be null only if the URI is not null
+     * @return absolute URI
+     */
     public static URI generateAbsoluteURI(URI uri, String login) {
         if (uri == null) {
             try {
@@ -62,38 +111,23 @@ public class UserProfile {
                         uri = new URI(null, login.replaceAll("\\W", ""), null);
                     } catch (URISyntaxException e1) {
                         //impossible
-                        logger.error(e1);
+                        LOG.error(e1);
                     }
                 }
             }
         }
-        if (!uri.isAbsolute())
+        if (!uri.isAbsolute()) {
             uri = URI.create("http://sandbox.wf4ever.project.com/users/").resolve(uri);
+        }
         return uri;
     }
 
 
-    /**
-     * @param login
-     * @param name
-     */
-    public UserProfile(String login, String password, String name, Role role) {
-        this(login, password, name, role, null);
-    }
-
-
-    /**
-     * @param uri
-     *            the uri to set
-     */
     public void setHomePage(URI uri) {
         this.homePage = uri;
     }
 
 
-    /**
-     * @return the uri
-     */
     public URI getHomePage() {
         return homePage;
     }
@@ -104,9 +138,6 @@ public class UserProfile {
     }
 
 
-    /**
-     * @return the password
-     */
     public String getPassword() {
         return password;
     }
@@ -122,9 +153,6 @@ public class UserProfile {
     }
 
 
-    /**
-     * @return the uri
-     */
     public URI getUri() {
         return uri;
     }
