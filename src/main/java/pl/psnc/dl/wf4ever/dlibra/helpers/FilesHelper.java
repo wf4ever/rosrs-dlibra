@@ -182,7 +182,8 @@ public class FilesHelper {
                         zipOut.putNextEntry(entry);
                         logger.debug("Creating a version input stream for " + versionId.toString() + " edition "
                                 + editionId.toString());
-                        InputStream versionInputStream = contentServer.getVersionInputStream(versionId);
+                        InputStream versionInputStream = new UnlockingInputStream(
+                                contentServer.getVersionInputStream(versionId), contentServer, versionId);
                         logger.debug("Created a version input stream for " + versionId.toString());
                         try {
                             logger.debug("Start copying stream for " + versionId.toString());
@@ -219,7 +220,8 @@ public class FilesHelper {
             throws IdNotFoundException, RemoteException, DLibraException {
         VersionId versionId = getVersionId(editionId, filePath);
 
-        InputStream versionInputStream = contentServer.getVersionInputStream(versionId);
+        InputStream versionInputStream = new UnlockingInputStream(contentServer.getVersionInputStream(versionId),
+                contentServer, versionId);
         logger.debug("Returning a version stream for version Id " + versionId.toString() + " edition Id "
                 + editionId.toString());
         return versionInputStream;
