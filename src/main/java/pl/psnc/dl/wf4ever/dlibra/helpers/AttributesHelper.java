@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -55,6 +56,12 @@ public class AttributesHelper {
     public void storeAttributes(String workspaceId, String researchObjectId, String versionId,
             Multimap<URI, Object> attributes)
             throws RemoteException, IdNotFoundException, DLibraException {
+        logger.debug(String.format("Storing attributes: %s, %s, %s", workspaceId, researchObjectId, versionId));
+        if (logger.isDebugEnabled()) {
+            for (Entry<URI, Object> entry : attributes.entries()) {
+                logger.debug(String.format("%s->%s", entry.getKey(), entry.getValue()));
+            }
+        }
         AttributeValueSet avs = getAttributeValueSet(workspaceId, researchObjectId, versionId);
         for (URI uri : attributes.keySet()) {
             updateAttribute(avs, uri, attributes.get(uri));
