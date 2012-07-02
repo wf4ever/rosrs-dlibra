@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -142,6 +143,7 @@ public class FlowTests {
         getZippedVersion();
         getFileContent(files[0]);
         getFileContent(files[1]);
+        checkFileExists(files[0].path);
         getZippedFolder(directories[1]);
         createOrUpdateFile(files[0]);
         createOrUpdateFile(files[1]);
@@ -267,6 +269,12 @@ public class FlowTests {
         } catch (NotFoundException e) {
             // good
         }
+    }
+
+
+    private void checkFileExists(String path)
+            throws DigitalLibraryException, NotFoundException {
+        Assert.assertTrue(dl.fileExists(w, r, v, path));
     }
 
 
