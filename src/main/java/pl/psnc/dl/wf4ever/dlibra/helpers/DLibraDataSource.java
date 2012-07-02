@@ -314,6 +314,20 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
+    public boolean fileExists(String workspaceId, String researchObjectId, String versionId, String filePath)
+            throws NotFoundException, DigitalLibraryException {
+        try {
+            EditionId editionId = getEditionHelper().getLastEditionId(researchObjectId, versionId);
+            return getFilesHelper().fileExists(editionId, filePath);
+        } catch (IdNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (RemoteException | DLibraException e) {
+            throw new DigitalLibraryException(e);
+        }
+    }
+
+
+    @Override
     public ResourceInfo createOrUpdateFile(String workspaceId, String researchObjectId, String versionId,
             String filePath, InputStream inputStream, String type)
             throws DigitalLibraryException, NotFoundException, AccessDeniedException {
@@ -637,4 +651,5 @@ public class DLibraDataSource implements DigitalLibrary {
         }
 
     }
+
 }

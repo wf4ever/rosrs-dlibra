@@ -240,6 +240,12 @@ public class FilesHelper {
     }
 
 
+    public boolean fileExists(EditionId editionId, String filePath)
+            throws IdNotFoundException, RemoteException, DLibraException {
+        return getVersionId(editionId, filePath) != null;
+    }
+
+
     /*
      * from http://rgagnon.com/javadetails/java-0596.html
      */

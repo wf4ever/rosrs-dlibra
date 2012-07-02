@@ -67,6 +67,25 @@ public interface DigitalLibrary {
             throws DigitalLibraryException, NotFoundException;
 
 
+    /**
+     * Check if the file exists in the research object.
+     * 
+     * @param workspaceId
+     *            workspace id
+     * @param researchObjectId
+     *            research object id
+     * @param versionId
+     *            version id
+     * @param filePath
+     *            file path
+     * @return true if the file exists, false otherwise
+     * @throws NotFoundException
+     * @throws DigitalLibraryException
+     */
+    public boolean fileExists(String workspaceId, String researchObjectId, String versionId, String filePath)
+            throws NotFoundException, DigitalLibraryException;
+
+
     public List<String> getResearchObjectIds(String workspaceId)
             throws DigitalLibraryException, NotFoundException;
 
@@ -158,4 +177,5 @@ public interface DigitalLibrary {
     public void storeAttributes(String workspaceId, String researchObjectId, String versionId,
             Multimap<URI, Object> roAttributes)
             throws NotFoundException, DigitalLibraryException;
+
 }
