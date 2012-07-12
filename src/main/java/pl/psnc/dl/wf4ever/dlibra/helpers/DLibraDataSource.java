@@ -315,12 +315,12 @@ public class DLibraDataSource implements DigitalLibrary {
 
     @Override
     public boolean fileExists(String workspaceId, String researchObjectId, String versionId, String filePath)
-            throws NotFoundException, DigitalLibraryException {
+            throws DigitalLibraryException {
         try {
             EditionId editionId = getEditionHelper().getLastEditionId(researchObjectId, versionId);
             return getFilesHelper().fileExists(editionId, filePath);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            return false;
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }

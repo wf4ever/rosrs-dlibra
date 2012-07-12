@@ -79,11 +79,10 @@ public interface DigitalLibrary {
      * @param filePath
      *            file path
      * @return true if the file exists, false otherwise
-     * @throws NotFoundException
      * @throws DigitalLibraryException
      */
     public boolean fileExists(String workspaceId, String researchObjectId, String versionId, String filePath)
-            throws NotFoundException, DigitalLibraryException;
+            throws DigitalLibraryException;
 
 
     public List<String> getResearchObjectIds(String workspaceId)
