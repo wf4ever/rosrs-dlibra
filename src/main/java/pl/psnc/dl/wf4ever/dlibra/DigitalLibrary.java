@@ -22,6 +22,10 @@ public interface DigitalLibrary {
             throws DigitalLibraryException, NotFoundException;
 
 
+    public UserProfile getUserProfile(String login)
+            throws DigitalLibraryException, NotFoundException;
+
+
     public List<String> getResourcePaths(String workspaceId, String researchObjectId, String versionId, String folder)
             throws DigitalLibraryException, NotFoundException;
 
@@ -89,12 +93,38 @@ public interface DigitalLibrary {
             throws DigitalLibraryException, NotFoundException;
 
 
+    /**
+     * Return a list of research object ids for a particular user.
+     * 
+     * @param user
+     *            the research object owner
+     * @return list of ids
+     * @throws NotFoundException
+     * @throws DigitalLibraryException
+     */
+    public List<String> getResearchObjectIds(UserProfile user, String workspaceId)
+            throws NotFoundException, DigitalLibraryException;
+
+
     public void createResearchObject(String workspaceId, String researchObjectId)
             throws DigitalLibraryException, NotFoundException, ConflictException;
 
 
     public List<String> getVersionIds(String workspaceId, String researchObjectId)
             throws DigitalLibraryException, NotFoundException;
+
+
+    /**
+     * Return a list of version ids for a particular user.
+     * 
+     * @param user
+     *            the versions owner
+     * @return list of ids
+     * @throws NotFoundException
+     * @throws DigitalLibraryException
+     */
+    public List<String> getVersionIds(UserProfile user, String workspaceId, String researchObjectId)
+            throws NotFoundException, DigitalLibraryException;
 
 
     public void createVersion(String workspaceId, String researchObjectId, String version, InputStream mainFileContent,
@@ -152,6 +182,19 @@ public interface DigitalLibrary {
 
     public List<String> getWorkspaceIds()
             throws DigitalLibraryException, NotFoundException;
+
+
+    /**
+     * Return a list of workspace ids for a particular user.
+     * 
+     * @param user
+     *            the workspaces owner
+     * @return list of ids
+     * @throws NotFoundException
+     * @throws DigitalLibraryException
+     */
+    public List<String> getWorkspaceIds(UserProfile user)
+            throws NotFoundException, DigitalLibraryException;
 
 
     public void createWorkspace(String workspaceId)

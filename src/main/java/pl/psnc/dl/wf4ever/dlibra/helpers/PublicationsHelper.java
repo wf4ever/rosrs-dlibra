@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import pl.psnc.dl.wf4ever.dlibra.UserProfile;
 import pl.psnc.dlibra.common.Info;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -87,7 +88,32 @@ public class PublicationsHelper {
      */
     public List<AbstractPublicationInfo> listUserGroupPublications(byte groupState)
             throws RemoteException, DLibraException {
-        DirectoryId workspaceDir = getWorkspaceDirectoryId();
+        return listUserGroupPublications(getWorkspaceDirectoryId(), groupState);
+    }
+
+
+    /**
+     * Returns list of all group publications (ROs) of a particular user.
+     * 
+     * @return
+     * @throws RemoteException
+     * @throws DLibraException
+     */
+    public List<AbstractPublicationInfo> listUserGroupPublications(UserProfile user, byte groupState)
+            throws RemoteException, DLibraException {
+        return listUserGroupPublications(getWorkspaceDirectoryId(user.getLogin()), groupState);
+    }
+
+
+    /**
+     * Returns list of all group publications (ROs) of the current user.
+     * 
+     * @return
+     * @throws RemoteException
+     * @throws DLibraException
+     */
+    private List<AbstractPublicationInfo> listUserGroupPublications(DirectoryId workspaceDir, byte groupState)
+            throws RemoteException, DLibraException {
         Collection<Info> resultInfos = directoryManager.getObjects(
             new DirectoryFilter(null, workspaceDir).setGroupStatus(groupState).setState(
                 (byte) (Publication.PUB_STATE_ALL - Publication.PUB_STATE_PERMANENT_DELETED)),
@@ -176,8 +202,34 @@ public class PublicationsHelper {
      */
     public List<PublicationInfo> listPublicationsInGroup(String groupPublicationName)
             throws RemoteException, DLibraException {
-        PublicationId groupId = getGroupId(groupPublicationName);
+        return listPublicationsInGroup(getGroupId(groupPublicationName));
+    }
 
+
+    /**
+     * Returns list of all publications (versions) for given group publication (RO) for a given user.
+     * 
+     * @param groupPublicationName
+     * @return
+     * @throws RemoteException
+     * @throws DLibraException
+     */
+    public List<PublicationInfo> listPublicationsInGroup(UserProfile user, String groupPublicationName)
+            throws RemoteException, DLibraException {
+        return listPublicationsInGroup(getGroupId(user, groupPublicationName));
+    }
+
+
+    /**
+     * Returns list of all publications (versions) for given group publication (RO).
+     * 
+     * @param groupPublicationName
+     * @return
+     * @throws RemoteException
+     * @throws DLibraException
+     */
+    private List<PublicationInfo> listPublicationsInGroup(PublicationId groupId)
+            throws RemoteException, DLibraException {
         InputFilter in = new PublicationFilter(null, groupId).setGroupStatus(Publication.PUB_GROUP_LEAF)
                 .setPublicationState((byte) (Publication.PUB_STATE_ALL - Publication.PUB_STATE_PERMANENT_DELETED));
         OutputFilter out = new OutputFilter(AbstractPublicationInfo.class, List.class);
@@ -334,6 +386,15 @@ public class PublicationsHelper {
     }
 
 
+    PublicationId getGroupId(UserProfile user, String groupPublicationName)
+            throws RemoteException, DLibraException {
+        if (getWorkspaceDirectoryId(user.getLogin()) != null)
+            return getGroupId(groupPublicationName, getWorkspaceDirectoryId(user.getLogin()));
+        else
+            return getGroupId(groupPublicationName, dLibra.getWorkspacesContainerDirectoryId());
+    }
+
+
     PublicationId getGroupId(String groupPublicationName, DirectoryId directoryId)
             throws RemoteException, DLibraException {
         Collection<Info> resultInfos = directoryManager.getObjects(
@@ -382,6 +443,13 @@ public class PublicationsHelper {
     private DirectoryId getWorkspaceDirectoryId()
             throws RemoteException, DLibraException {
         User userData = userManager.getUserData(dLibra.getUserLogin());
+        return userData.getHomedir();
+    }
+
+
+    private DirectoryId getWorkspaceDirectoryId(String userLogin)
+            throws RemoteException, DLibraException {
+        User userData = userManager.getUserData(userLogin);
         return userData.getHomedir();
     }
 

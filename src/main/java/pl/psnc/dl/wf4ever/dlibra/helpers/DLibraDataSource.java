@@ -66,8 +66,6 @@ public class DLibraDataSource implements DigitalLibrary {
 
     private final String userLogin;
 
-    private final String userPassword;
-
     private final ContentServer contentServer;
 
     private final UserManager userManager;
@@ -97,7 +95,6 @@ public class DLibraDataSource implements DigitalLibrary {
                 UserInterface.SERVICE_TYPE, port), authorizationToken);
 
         this.userLogin = userLogin;
-        this.userPassword = password;
         this.workspacesContainerDirectoryId = new DirectoryId(workspacesContainerDirectoryId);
         this.collectionId = new LibCollectionId(collectionId);
 
@@ -181,9 +178,16 @@ public class DLibraDataSource implements DigitalLibrary {
     @Override
     public UserProfile getUserProfile()
             throws DigitalLibraryException, NotFoundException {
+        return getUserProfile(userLogin);
+    }
+
+
+    @Override
+    public UserProfile getUserProfile(String login)
+            throws DigitalLibraryException, NotFoundException {
         User user;
         try {
-            user = userManager.getUserData(userLogin);
+            user = userManager.getUserData(login);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {
@@ -191,13 +195,13 @@ public class DLibraDataSource implements DigitalLibrary {
         }
         // FIXME should be based on sth else than login
         UserProfile.Role role;
-        if (userLogin.equals("wfadmin"))
+        if (login.equals("wfadmin"))
             role = Role.ADMIN;
-        else if (userLogin.equals("wf4ever_reader"))
+        else if (login.equals("wf4ever_reader"))
             role = Role.PUBLIC;
         else
             role = Role.AUTHENTICATED;
-        return new UserProfile(userLogin, userPassword, user.getName(), role);
+        return new UserProfile(user.getLogin(), user.getPassword(), user.getName(), role);
     }
 
 
@@ -376,6 +380,25 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
+    public List<String> getResearchObjectIds(UserProfile user, String workspaceId)
+            throws NotFoundException, DigitalLibraryException {
+        List<AbstractPublicationInfo> infos;
+        try {
+            infos = getPublicationsHelper().listUserGroupPublications(user, Publication.PUB_GROUP_MID);
+        } catch (IdNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (RemoteException | DLibraException e) {
+            throw new DigitalLibraryException(e);
+        }
+        List<String> ids = new ArrayList<String>();
+        for (AbstractPublicationInfo info : infos) {
+            ids.add(info.getLabel());
+        }
+        return ids;
+    }
+
+
+    @Override
     public void createResearchObject(String workspaceId, String researchObjectId)
             throws DigitalLibraryException, NotFoundException, ConflictException {
         try {
@@ -396,6 +419,25 @@ public class DLibraDataSource implements DigitalLibrary {
         List<PublicationInfo> infos;
         try {
             infos = getPublicationsHelper().listPublicationsInGroup(researchObjectId);
+        } catch (IdNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (RemoteException | DLibraException e) {
+            throw new DigitalLibraryException(e);
+        }
+        List<String> ids = new ArrayList<String>();
+        for (AbstractPublicationInfo info : infos) {
+            ids.add(info.getLabel());
+        }
+        return ids;
+    }
+
+
+    @Override
+    public List<String> getVersionIds(UserProfile user, String workspaceId, String researchObjectId)
+            throws NotFoundException, DigitalLibraryException {
+        List<PublicationInfo> infos;
+        try {
+            infos = getPublicationsHelper().listPublicationsInGroup(user, researchObjectId);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {
@@ -595,6 +637,25 @@ public class DLibraDataSource implements DigitalLibrary {
         List<AbstractPublicationInfo> infos;
         try {
             infos = getPublicationsHelper().listUserGroupPublications(Publication.PUB_GROUP_ROOT);
+        } catch (IdNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (RemoteException | DLibraException e) {
+            throw new DigitalLibraryException(e);
+        }
+        List<String> ids = new ArrayList<String>();
+        for (AbstractPublicationInfo info : infos) {
+            ids.add(info.getLabel());
+        }
+        return ids;
+    }
+
+
+    @Override
+    public List<String> getWorkspaceIds(UserProfile user)
+            throws NotFoundException, DigitalLibraryException {
+        List<AbstractPublicationInfo> infos;
+        try {
+            infos = getPublicationsHelper().listUserGroupPublications(user, Publication.PUB_GROUP_ROOT);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {
