@@ -144,7 +144,6 @@ public class BasicTest {
         UserProfile user = dl.getUserProfile();
         Assert.assertEquals("User login is equal", USER_ID, user.getLogin());
         Assert.assertEquals("User name is equal", USERNAME, user.getName());
-        Assert.assertEquals("User password is equal", USER_PASSWORD, user.getPassword());
     }
 
 
