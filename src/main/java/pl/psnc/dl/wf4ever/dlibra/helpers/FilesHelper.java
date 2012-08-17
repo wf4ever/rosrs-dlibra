@@ -18,6 +18,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import pl.psnc.dl.wf4ever.dlibra.ResourceInfo;
@@ -42,7 +43,6 @@ import pl.psnc.dlibra.metadata.VersionInfo;
 import pl.psnc.dlibra.service.AccessDeniedException;
 import pl.psnc.dlibra.service.DLibraException;
 import pl.psnc.dlibra.service.IdNotFoundException;
-import pl.psnc.util.IOUtils;
 
 public class FilesHelper {
 
@@ -187,7 +187,7 @@ public class FilesHelper {
                         logger.debug("Created a version input stream for " + versionId.toString());
                         try {
                             logger.debug("Start copying stream for " + versionId.toString());
-                            IOUtils.copyStream(versionInputStream, zipOut);
+                            IOUtils.copy(versionInputStream, zipOut);
                             logger.debug("Finished copying stream for " + versionId.toString());
                         } finally {
                             logger.debug("Closing stream for " + versionId.toString());

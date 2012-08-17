@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pl.psnc.dl.wf4ever</groupId>
 	<artifactId>rosrs-dlibra</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.1.1-SNAPSHOT</version>
 	<name>ROSRS library for dLibra support</name>
 	<inceptionYear>2010</inceptionYear>
 	<developers>
@@ -35,26 +35,29 @@
 			<organization>PSNC</organization>
 		</developer>
 	</developers>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>dlteam.tools</groupId>
-			<artifactId>dlteam-common-util</artifactId>
-			<version>1.0.0</version>
+			<groupId>dlteam-tools-util</groupId>
+			<artifactId>dlteam-tools-util</artifactId>
+			<version>1.0.2</version>
 			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>dlteam.fwork.services</groupId>
+			<groupId>dlteam-fwork-services-common</groupId>
 			<artifactId>dlteam-fwork-services-common</artifactId>
-			<version>1.0.3-SNAPSHOT</version>
+			<version>1.0.6</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>dcore.common</groupId>
+			<groupId>dcore-common-base</groupId>
 			<artifactId>dcore-common-base</artifactId>
-			<version>1.0.4-SNAPSHOT</version>
+			<version>1.1.0</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -90,7 +93,7 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.1</version>
+			<version>2.4</version>
 		</dependency>
 	</dependencies>
 	<organization>
@@ -117,6 +120,7 @@
 	</build>
 	<scm>
 		<developerConnection>scm:git:git@github.com:wf4ever/rosrs-dlibra.git</developerConnection>
+		<tag>rosrs-dlibra-1.1.1</tag>
 	</scm>
 	<repositories>
 		<repository>
