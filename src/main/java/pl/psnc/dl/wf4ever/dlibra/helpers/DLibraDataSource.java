@@ -201,7 +201,7 @@ public class DLibraDataSource implements DigitalLibrary {
             role = Role.PUBLIC;
         else
             role = Role.AUTHENTICATED;
-        return new UserProfile(user.getLogin(), user.getPassword(), user.getName(), role);
+        return new UserProfile(user.getLogin(), user.getName(), role);
     }
 
 

@@ -33,9 +33,6 @@ public class UserProfile {
     /** User login. */
     private final String login;
 
-    /** User password. */
-    private final String password;
-
     /** Nice name. */
     private final String name;
 
@@ -63,10 +60,9 @@ public class UserProfile {
      * @param uri
      *            uri
      */
-    public UserProfile(String login, String password, String name, Role role, URI uri) {
+    public UserProfile(String login, String name, Role role, URI uri) {
         super();
         this.login = login;
-        this.password = password;
         this.name = name;
         this.role = role;
         this.uri = generateAbsoluteURI(uri, login);
@@ -85,8 +81,8 @@ public class UserProfile {
      * @param role
      *            role
      */
-    public UserProfile(String login, String password, String name, Role role) {
-        this(login, password, name, role, null);
+    public UserProfile(String login, String name, Role role) {
+        this(login, name, role, null);
     }
 
 
@@ -135,11 +131,6 @@ public class UserProfile {
 
     public String getLogin() {
         return login;
-    }
-
-
-    public String getPassword() {
-        return password;
     }
 
 
