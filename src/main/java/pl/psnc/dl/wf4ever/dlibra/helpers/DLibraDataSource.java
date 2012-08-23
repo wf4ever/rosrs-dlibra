@@ -348,6 +348,22 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
+    public ResourceInfo getFileInfo(String workspaceId, String researchObjectId, String versionId, String filePath)
+            throws NotFoundException, DigitalLibraryException, AccessDeniedException {
+        try {
+            EditionId editionId = getEditionHelper().getLastEditionId(researchObjectId, versionId);
+            return getFilesHelper().getFileInfo(editionId, filePath);
+        } catch (IdNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (AccessDeniedException e) {
+            throw e;
+        } catch (IOException | DLibraException e) {
+            throw new DigitalLibraryException(e);
+        }
+    }
+
+
+    @Override
     public void deleteFile(String workspaceId, String researchObjectId, String versionId, String filePath)
             throws DigitalLibraryException, NotFoundException {
         try {

@@ -20,6 +20,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 
 import pl.psnc.dl.wf4ever.dlibra.ResourceInfo;
 import pl.psnc.dlibra.common.Id;
@@ -288,13 +289,29 @@ public class FilesHelper {
 
         deleteUnnecessaryEmptyFolders(groupPublicationName, publicationName, filePath);
 
-        String name = filePath.substring(filePath.lastIndexOf('/') + 1);
-        byte[] fileDigest = contentServer.getFileDigest(createdVersionId);
-        String digest = getHex(fileDigest);
         VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(new InputFilter(versionId),
             new OutputFilter(VersionInfo.class)).getResultInfo();
+        return createResourceInfo(versionInfo, filePath);
+    }
+
+
+    public ResourceInfo getFileInfo(EditionId editionId, String filePath)
+            throws RemoteException, IdNotFoundException, AccessDeniedException, DLibraException {
+        VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(
+            new FileFilter().setEditionId(editionId).setFileName("/" + filePath), new OutputFilter(VersionInfo.class))
+                .getResultInfo();
+        return createResourceInfo(versionInfo, filePath);
+    }
+
+
+    private ResourceInfo createResourceInfo(VersionInfo versionInfo, String filePath)
+            throws RemoteException, IdNotFoundException, AccessDeniedException, DLibraException {
+        String name = filePath.substring(filePath.lastIndexOf('/') + 1);
+        byte[] fileDigest = contentServer.getFileDigest(versionInfo.getId());
+        String digest = getHex(fileDigest);
         long size = versionInfo.getSize();
-        return new ResourceInfo(name, digest, size, "MD5");
+        DateTime lastModified = new DateTime(versionInfo.getLastModificationDate());
+        return new ResourceInfo(name, digest, size, "MD5", lastModified);
     }
 
 

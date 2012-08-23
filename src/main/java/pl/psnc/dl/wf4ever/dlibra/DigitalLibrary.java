@@ -67,6 +67,29 @@ public interface DigitalLibrary {
             throws DigitalLibraryException, NotFoundException, AccessDeniedException;
 
 
+    /**
+     * Return the file metadata.
+     * 
+     * @param workspaceId
+     *            workspace id
+     * @param researchObjectId
+     *            RO id
+     * @param versionId
+     *            version id
+     * @param filePath
+     *            file path
+     * @return file metadata
+     * @throws NotFoundException
+     *             file not found
+     * @throws AccessDeniedException
+     *             no rights to get resource metadata
+     * @throws DigitalLibraryException
+     *             dLibra exception
+     */
+    public ResourceInfo getFileInfo(String workspaceId, String researchObjectId, String versionId, String filePath)
+            throws NotFoundException, DigitalLibraryException, AccessDeniedException;
+
+
     public void deleteFile(String workspaceId, String researchObjectId, String versionId, String filePath)
             throws DigitalLibraryException, NotFoundException;
 
