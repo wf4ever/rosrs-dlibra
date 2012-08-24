@@ -297,9 +297,9 @@ public class FilesHelper {
 
     public ResourceInfo getFileInfo(EditionId editionId, String filePath)
             throws RemoteException, IdNotFoundException, AccessDeniedException, DLibraException {
-        VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(
-            new FileFilter().setEditionId(editionId).setFileName("/" + filePath), new OutputFilter(VersionInfo.class))
-                .getResultInfo();
+        VersionId versionId = getVersionId(editionId, filePath);
+        VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(new InputFilter(versionId),
+            new OutputFilter(VersionInfo.class)).getResultInfo();
         return createResourceInfo(versionInfo, filePath);
     }
 
