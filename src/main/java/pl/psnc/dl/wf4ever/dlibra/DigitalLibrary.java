@@ -13,16 +13,38 @@ import pl.psnc.dlibra.service.AccessDeniedException;
 import com.google.common.collect.Multimap;
 
 /**
+ * Digital library abstraction.
+ * 
  * @author piotrhol
  * 
  */
 public interface DigitalLibrary {
 
-    public UserProfile getUserProfile()
+    /**
+     * Get the profile of the user that is logged in to dLibra.
+     * 
+     * @return user profile
+     * @throws NotFoundException
+     *             file not found
+     * @throws DigitalLibraryException
+     *             dLibra exception
+     */
+    UserProfile getUserProfile()
             throws DigitalLibraryException, NotFoundException;
 
 
-    public UserProfile getUserProfile(String login)
+    /**
+     * Get the profile of a user.
+     * 
+     * @param login
+     *            user login
+     * @return user profile
+     * @throws NotFoundException
+     *             file not found
+     * @throws DigitalLibraryException
+     *             dLibra exception
+     */
+    UserProfile getUserProfile(String login)
             throws DigitalLibraryException, NotFoundException;
 
 
@@ -86,7 +108,7 @@ public interface DigitalLibrary {
      * @throws DigitalLibraryException
      *             dLibra exception
      */
-    public ResourceInfo getFileInfo(String workspaceId, String researchObjectId, String versionId, String filePath)
+    ResourceInfo getFileInfo(String workspaceId, String researchObjectId, String versionId, String filePath)
             throws NotFoundException, DigitalLibraryException, AccessDeniedException;
 
 

@@ -397,6 +397,8 @@ public class PublicationsHelper {
 
     PublicationId getGroupId(String groupPublicationName, DirectoryId directoryId)
             throws RemoteException, DLibraException {
+        logger.debug(String.format("Get group id: name = %s directoryId = %s", groupPublicationName,
+            directoryId.toString()));
         Collection<Info> resultInfos = directoryManager.getObjects(
             new DirectoryFilter(null, directoryId).setGroupStatus(
                 (byte) (Publication.PUB_GROUP_ROOT | Publication.PUB_GROUP_MID)).setState(

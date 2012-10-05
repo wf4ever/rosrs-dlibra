@@ -195,12 +195,13 @@ public class DLibraDataSource implements DigitalLibrary {
         }
         // FIXME should be based on sth else than login
         UserProfile.Role role;
-        if (login.equals("wfadmin"))
+        if (login.equals("wfadmin")) {
             role = Role.ADMIN;
-        else if (login.equals("wf4ever_reader"))
+        } else if (login.equals("wf4ever_reader")) {
             role = Role.PUBLIC;
-        else
+        } else {
             role = Role.AUTHENTICATED;
+        }
         return new UserProfile(user.getLogin(), user.getName(), role);
     }
 
