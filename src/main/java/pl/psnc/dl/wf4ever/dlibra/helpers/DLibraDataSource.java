@@ -318,6 +318,7 @@ public class DLibraDataSource implements DigitalLibrary {
             createWorkspaceGroupPublication(ro);
             createRoGroupPublication(ro);
             createVersionPublication(ro, mainFileContent, mainFilePath, mainFileMimeType);
+            getPublicationsHelper().publishPublication(ro);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (IOException | DLibraException | TransformerException e) {
