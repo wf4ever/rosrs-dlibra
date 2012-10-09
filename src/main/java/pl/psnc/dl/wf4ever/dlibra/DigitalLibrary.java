@@ -3,12 +3,19 @@
  */
 package pl.psnc.dl.wf4ever.dlibra;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Set;
 
+import javax.xml.transform.TransformerException;
+
+import pl.psnc.dl.wf4ever.common.ResearchObject;
+import pl.psnc.dl.wf4ever.common.ResourceInfo;
+import pl.psnc.dl.wf4ever.common.UserProfile;
 import pl.psnc.dlibra.service.AccessDeniedException;
+import pl.psnc.dlibra.service.DLibraException;
 
 import com.google.common.collect.Multimap;
 
@@ -48,44 +55,23 @@ public interface DigitalLibrary {
             throws DigitalLibraryException, NotFoundException;
 
 
-    public List<String> getResourcePaths(String workspaceId, String researchObjectId, String versionId, String folder)
+    public List<String> getResourcePaths(ResearchObject ro, String folder)
             throws DigitalLibraryException, NotFoundException;
 
 
-    public List<String> getResourcePaths(String workspaceId, String researchObjectId, String versionId, String folder,
-            long editionId)
+    public InputStream getZippedFolder(ResearchObject ro, String folder)
             throws DigitalLibraryException, NotFoundException;
 
 
-    public InputStream getZippedFolder(String workspaceId, String researchObjectId, String versionId, String folder)
+    public InputStream getFileContents(ResearchObject ro, String filePath)
             throws DigitalLibraryException, NotFoundException;
 
 
-    public InputStream getZippedFolder(String workspaceId, String researchObjectId, String versionId, String folder,
-            long editionId)
+    public String getFileMimeType(ResearchObject ro, String filePath)
             throws DigitalLibraryException, NotFoundException;
 
 
-    public InputStream getFileContents(String workspaceId, String researchObjectId, String versionId, String filePath)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public InputStream getFileContents(String workspaceId, String researchObjectId, String versionId, String filePath,
-            long editionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public String getFileMimeType(String workspaceId, String researchObjectId, String versionId, String filePath)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public String getFileMimeType(String workspaceId, String researchObjectId, String versionId, String filePath,
-            long editionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public ResourceInfo createOrUpdateFile(String workspaceId, String researchObjectId, String versionId,
-            String filePath, InputStream inputStream, String type)
+    public ResourceInfo createOrUpdateFile(ResearchObject ro, String filePath, InputStream inputStream, String type)
             throws DigitalLibraryException, NotFoundException, AccessDeniedException;
 
 
@@ -108,11 +94,11 @@ public interface DigitalLibrary {
      * @throws DigitalLibraryException
      *             dLibra exception
      */
-    ResourceInfo getFileInfo(String workspaceId, String researchObjectId, String versionId, String filePath)
+    ResourceInfo getFileInfo(ResearchObject ro, String filePath)
             throws NotFoundException, DigitalLibraryException, AccessDeniedException;
 
 
-    public void deleteFile(String workspaceId, String researchObjectId, String versionId, String filePath)
+    public void deleteFile(ResearchObject ro, String filePath)
             throws DigitalLibraryException, NotFoundException;
 
 
@@ -130,59 +116,18 @@ public interface DigitalLibrary {
      * @return true if the file exists, false otherwise
      * @throws DigitalLibraryException
      */
-    public boolean fileExists(String workspaceId, String researchObjectId, String versionId, String filePath)
+    public boolean fileExists(ResearchObject ro, String filePath)
             throws DigitalLibraryException;
 
 
-    public List<String> getResearchObjectIds(String workspaceId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    /**
-     * Return a list of research object ids for a particular user.
-     * 
-     * @param user
-     *            the research object owner
-     * @return list of ids
-     * @throws NotFoundException
-     * @throws DigitalLibraryException
-     */
-    public List<String> getResearchObjectIds(UserProfile user, String workspaceId)
-            throws NotFoundException, DigitalLibraryException;
-
-
-    public void createResearchObject(String workspaceId, String researchObjectId)
+    public void createResearchObject(ResearchObject ro, InputStream mainFileContent, String mainFilePath,
+            String mainFileMimeType)
             throws DigitalLibraryException, NotFoundException, ConflictException;
 
 
-    public List<String> getVersionIds(String workspaceId, String researchObjectId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    /**
-     * Return a list of version ids for a particular user.
-     * 
-     * @param user
-     *            the versions owner
-     * @return list of ids
-     * @throws NotFoundException
-     * @throws DigitalLibraryException
-     */
-    public List<String> getVersionIds(UserProfile user, String workspaceId, String researchObjectId)
-            throws NotFoundException, DigitalLibraryException;
-
-
-    public void createVersion(String workspaceId, String researchObjectId, String version, InputStream mainFileContent,
-            String mainFilePath, String mainFileMimeType)
-            throws DigitalLibraryException, NotFoundException, ConflictException;
-
-
-    public void createVersion(String workspaceId, String researchObjectId, String version, String baseVersion)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public void deleteResearchObject(String workspaceId, String researchObjectId)
-            throws DigitalLibraryException, NotFoundException;
+    public void deleteResearchObject(ResearchObject ro)
+            throws DigitalLibraryException, NotFoundException, RemoteException, DLibraException, IOException,
+            TransformerException;
 
 
     public boolean createUser(String userId, String password, String username)
@@ -197,56 +142,7 @@ public interface DigitalLibrary {
             throws DigitalLibraryException, NotFoundException;
 
 
-    public Set<Snapshot> getEditionList(String workspaceId, String researchObjectId, String versionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public InputStream getZippedVersion(String workspaceId, String researchObjectId, String versionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public InputStream getZippedVersion(String workspaceId, String researchObjectId, String versionId, long editionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public void publishVersion(String workspaceId, String researchObjectId, String versionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public void unpublishVersion(String workspaceId, String researchObjectId, String versionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public Snapshot createEdition(String workspaceId, String versionName, String researchObjectId, String versionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public void deleteVersion(String workspaceId, String researchObjectId, String versionId)
-            throws DigitalLibraryException, NotFoundException;
-
-
-    public List<String> getWorkspaceIds()
-            throws DigitalLibraryException, NotFoundException;
-
-
-    /**
-     * Return a list of workspace ids for a particular user.
-     * 
-     * @param user
-     *            the workspaces owner
-     * @return list of ids
-     * @throws NotFoundException
-     * @throws DigitalLibraryException
-     */
-    public List<String> getWorkspaceIds(UserProfile user)
-            throws NotFoundException, DigitalLibraryException;
-
-
-    public void createWorkspace(String workspaceId)
-            throws DigitalLibraryException, NotFoundException, ConflictException;
-
-
-    public void deleteWorkspace(String workspaceId)
+    public InputStream getZippedVersion(ResearchObject ro)
             throws DigitalLibraryException, NotFoundException;
 
 
@@ -261,8 +157,7 @@ public interface DigitalLibrary {
      * @throws NotFoundException
      * @throws DigitalLibraryException
      */
-    public void storeAttributes(String workspaceId, String researchObjectId, String versionId,
-            Multimap<URI, Object> roAttributes)
+    public void storeAttributes(ResearchObject ro, Multimap<URI, Object> roAttributes)
             throws NotFoundException, DigitalLibraryException;
 
 }

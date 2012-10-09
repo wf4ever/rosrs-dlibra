@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dlibra.common.CollectionResult;
 import pl.psnc.dlibra.common.DLObject;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -53,16 +54,14 @@ public class AttributesHelper {
     }
 
 
-    public void storeAttributes(String workspaceId, String researchObjectId, String versionId,
-            Multimap<URI, Object> attributes)
+    public void storeAttributes(ResearchObject ro, Multimap<URI, Object> attributes)
             throws RemoteException, IdNotFoundException, DLibraException {
-        logger.debug(String.format("Storing attributes: %s, %s, %s", workspaceId, researchObjectId, versionId));
         if (logger.isDebugEnabled()) {
             for (Entry<URI, Object> entry : attributes.entries()) {
                 logger.debug(String.format("%s->%s", entry.getKey(), entry.getValue()));
             }
         }
-        AttributeValueSet avs = getAttributeValueSet(workspaceId, researchObjectId, versionId);
+        AttributeValueSet avs = getAttributeValueSet(ro);
         for (URI uri : attributes.keySet()) {
             updateAttribute(avs, uri, attributes.get(uri));
         }
@@ -70,9 +69,9 @@ public class AttributesHelper {
     }
 
 
-    private AttributeValueSet getAttributeValueSet(String workspaceId, String researchObjectId, String versionId)
+    private AttributeValueSet getAttributeValueSet(ResearchObject ro)
             throws RemoteException, DLibraException, IdNotFoundException {
-        EditionId editionId = dl.getEditionHelper().getLastEditionId(researchObjectId, versionId);
+        EditionId editionId = new EditionId(dl.getDlEditionId(ro));
 
         AttributeValueSet avs = dl.getMetadataServer().getElementMetadataManager()
                 .getAttributeValueSet(editionId, AttributeValue.AV_ASSOC_ALL);

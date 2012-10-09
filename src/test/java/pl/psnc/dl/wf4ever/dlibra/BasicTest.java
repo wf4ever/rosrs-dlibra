@@ -25,6 +25,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import pl.psnc.dl.wf4ever.common.ResearchObject;
+import pl.psnc.dl.wf4ever.common.UserProfile;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
 import pl.psnc.dlibra.service.DLibraException;
 
@@ -61,6 +63,8 @@ public class BasicTest {
 
     private static final String USER_PASSWORD = "password";
 
+    private static final ResearchObject RO = new ResearchObject(URI.create("http://example.org/ROs/foobar/"));
+
 
     /**
      * @throws java.lang.Exception
@@ -83,7 +87,7 @@ public class BasicTest {
         try {
             DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                     USER_PASSWORD);
-            dl.deleteWorkspace("w");
+            dl.deleteResearchObject(RO);
         } catch (Exception e) {
 
         }
@@ -117,11 +121,9 @@ public class BasicTest {
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
-        InputStream in = dl.getFileContents("w", "r", "v", MAIN_FILE_PATH);
+        InputStream in = dl.getFileContents(RO, MAIN_FILE_PATH);
         try {
             String file = IOUtils.toString(in);
             assertEquals("Manifest is properly saved", MAIN_FILE_CONTENT, file);
@@ -156,36 +158,12 @@ public class BasicTest {
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         try {
-            dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+            dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
                 MAIN_FILE_MIME_TYPE);
-            fail("Should throw some exception");
-        } catch (ConflictException e) {
-            // good
-        } catch (Exception e) {
-            fail("Threw a wrong exception: " + e.getClass().toString());
-        }
-    }
-
-
-    @Test
-    public final void testCreateDuplicateRO()
-            throws RemoteException, MalformedURLException, UnknownHostException, DLibraException,
-            DigitalLibraryException, NotFoundException, ConflictException {
-        DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
-                ADMIN_PASSWORD);
-        dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
-        DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
-                USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        try {
-            dl.createResearchObject("w", "r");
-            fail("Should throw some exception");
+            fail("Should throw conflict exception");
         } catch (ConflictException e) {
             // good
         } catch (Exception e) {
@@ -203,14 +181,12 @@ public class BasicTest {
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         Multimap<URI, Object> atts = HashMultimap.create();
         atts.put(URI.create("a"), "foo");
         atts.put(URI.create("a"), "bar");
         atts.put(URI.create("b"), "lorem ipsum");
-        dl.storeAttributes("w", "r", "v", atts);
+        dl.storeAttributes(RO, atts);
     }
 }

@@ -4,17 +4,15 @@
 package pl.psnc.dl.wf4ever.dlibra;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Date;
 import java.util.Properties;
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -23,6 +21,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import pl.psnc.dl.wf4ever.common.ResearchObject;
+import pl.psnc.dl.wf4ever.common.ResourceInfo;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
 import pl.psnc.dlibra.service.AccessDeniedException;
 import pl.psnc.dlibra.service.DLibraException;
@@ -61,19 +61,13 @@ public class FlowTests {
 
     private static final String[] directories = { "", "dir/", "testdir" };
 
-    private static final String w = "w";
-
-    private static final String r = "r";
-
-    private static final String v = "v";
-
-    private static final String v2 = "v2";
-
     private static final String MAIN_FILE_MIME_TYPE = "text/plain";
 
     private static final String MAIN_FILE_CONTENT = "test";
 
     private static final String MAIN_FILE_PATH = "mainFile.txt";
+
+    private static final ResearchObject RO = new ResearchObject(URI.create("http://example.org/ROs/foobar/"));
 
 
     /**
@@ -111,9 +105,7 @@ public class FlowTests {
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.createUser(userId, USER_PASSWORD, USERNAME);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
 
         files[0] = new FileRecord("file1.txt", "file1.txt", "text/plain");
@@ -129,7 +121,7 @@ public class FlowTests {
     public void tearDown()
             throws Exception {
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
-        dl.deleteWorkspace("w");
+        dl.deleteResearchObject(RO);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.deleteUser(userId);
     }
@@ -147,7 +139,6 @@ public class FlowTests {
         getZippedFolder(directories[1]);
         createOrUpdateFile(files[0]);
         createOrUpdateFile(files[1]);
-        createVersionAsCopy();
         deleteFile(files[0].path);
         deleteFile(files[1].path);
         checkNoFile(files[0].path);
@@ -169,35 +160,6 @@ public class FlowTests {
 
 
     @Test
-    public final void testEditions()
-            throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException {
-        long edId1 = createEdition();
-        createOrUpdateFile(files[0]);
-        createOrUpdateFile(files[1]);
-        checkNoEditionPublished();
-        publishEdition();
-        checkPublished(edId1);
-        long edId2 = createEdition();
-        createOrUpdateFile(files[2]);
-        deleteFile(files[0].path);
-        getFileContent(files[1]);
-        getFileContent(files[2]);
-        checkNoFile(files[0].path);
-        getFileContent(files[0], edId1);
-        getFileContent(files[1], edId1);
-        checkNoFile(files[2].path, edId1);
-        getFileContent(files[1], edId2);
-        getFileContent(files[2], edId2);
-        checkNoFile(files[0].path, edId2);
-        checkPublished(edId1);
-        publishEdition();
-        checkPublished(edId2);
-        unpublishEdition();
-        checkNoEditionPublished();
-    }
-
-
-    @Test
     public final void testPermissions()
             throws DigitalLibraryException, IOException, NotFoundException, ConflictException, DLibraException {
         createOrUpdateFile(files[0]);
@@ -210,61 +172,10 @@ public class FlowTests {
     }
 
 
-    private void unpublishEdition()
-            throws DigitalLibraryException, NotFoundException {
-        dl.unpublishVersion(w, r, v);
-    }
-
-
-    private void publishEdition()
-            throws DigitalLibraryException, NotFoundException {
-        dl.publishVersion(w, r, v);
-    }
-
-
-    private void checkPublished(long edId)
-            throws DigitalLibraryException, NotFoundException {
-        Set<Snapshot> eds = dl.getEditionList(w, r, v);
-        for (Snapshot ed : eds) {
-            if (ed.getId() == edId) {
-                assertTrue("Edition should be published", ed.isPublished());
-            } else {
-                assertFalse("No edition should be published", ed.isPublished());
-            }
-        }
-    }
-
-
-    private void checkNoEditionPublished()
-            throws DigitalLibraryException, NotFoundException {
-        Set<Snapshot> eds = dl.getEditionList(w, r, v);
-        for (Snapshot ed : eds) {
-            assertFalse("No edition should be published", ed.isPublished());
-        }
-    }
-
-
-    private long createEdition()
-            throws DigitalLibraryException, NotFoundException {
-        return dl.createEdition(w, v, r, v).getId();
-    }
-
-
     private void checkNoFile(String path)
             throws DigitalLibraryException, IOException {
         try {
-            dl.getFileContents(w, r, v, path).close();
-            fail("Deleted file doesn't throw IdNotFoundException");
-        } catch (NotFoundException e) {
-            // good
-        }
-    }
-
-
-    private void checkNoFile(String path, long edId)
-            throws DigitalLibraryException, IOException {
-        try {
-            dl.getFileContents(w, r, v, path, edId).close();
+            dl.getFileContents(RO, path).close();
             fail("Deleted file doesn't throw IdNotFoundException");
         } catch (NotFoundException e) {
             // good
@@ -274,52 +185,36 @@ public class FlowTests {
 
     private void checkFileExists(String path)
             throws DigitalLibraryException, NotFoundException {
-        Assert.assertTrue(dl.fileExists(w, r, v, path));
+        Assert.assertTrue(dl.fileExists(RO, path));
     }
 
 
     private void deleteFile(String path)
             throws DigitalLibraryException, NotFoundException {
-        dl.deleteFile(w, r, v, path);
-    }
-
-
-    private void createVersionAsCopy()
-            throws DigitalLibraryException, NotFoundException, ConflictException {
-        dl.createVersion(w, r, v2, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
-            MAIN_FILE_MIME_TYPE);
+        dl.deleteFile(RO, path);
     }
 
 
     private void getZippedFolder(String path)
             throws DigitalLibraryException, IOException, NotFoundException {
-        InputStream zip = dl.getZippedFolder(w, r, v, path);
+        InputStream zip = dl.getZippedFolder(RO, path);
         assertNotNull(zip);
         zip.close();
     }
 
 
-    private void getFileContent(FileRecord file, long edId)
-            throws DigitalLibraryException, IOException, NotFoundException {
-        InputStream f = dl.getFileContents(w, r, v, file.path, edId);
-        assertNotNull(f);
-        f.close();
-        assertEquals(file.mimeType, dl.getFileMimeType(w, r, v, file.path, edId));
-    }
-
-
     private void getFileContent(FileRecord file)
             throws DigitalLibraryException, IOException, NotFoundException {
-        InputStream f = dl.getFileContents(w, r, v, file.path);
+        InputStream f = dl.getFileContents(RO, file.path);
         assertNotNull(f);
         f.close();
-        assertEquals(file.mimeType, dl.getFileMimeType(w, r, v, file.path));
+        assertEquals(file.mimeType, dl.getFileMimeType(RO, file.path));
     }
 
 
     private void getZippedVersion()
             throws DigitalLibraryException, NotFoundException {
-        InputStream zip1 = dl.getZippedVersion(w, r, v);
+        InputStream zip1 = dl.getZippedVersion(RO);
         assertNotNull(zip1);
     }
 
@@ -327,7 +222,7 @@ public class FlowTests {
     private void createOrUpdateFile(FileRecord file)
             throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException {
         InputStream f = file.open();
-        ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, file.path, f, file.mimeType);
+        ResourceInfo r1 = dl.createOrUpdateFile(RO, file.path, f, file.mimeType);
         f.close();
         assertNotNull(r1);
     }
@@ -337,7 +232,7 @@ public class FlowTests {
             throws DigitalLibraryException, IOException, NotFoundException {
         InputStream f = file.open();
         try {
-            dl.createOrUpdateFile(w, r, v, file.path, f, file.mimeType);
+            dl.createOrUpdateFile(RO, file.path, f, file.mimeType);
             fail("Should throw an exception when creating file");
         } catch (AccessDeniedException e) {
             // good
@@ -350,7 +245,7 @@ public class FlowTests {
 
     private void createOrUpdateDirectory(String path)
             throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException {
-        ResourceInfo r1 = dl.createOrUpdateFile(w, r, v, path, new ByteArrayInputStream(new byte[0]), "text/plain");
+        ResourceInfo r1 = dl.createOrUpdateFile(RO, path, new ByteArrayInputStream(new byte[0]), "text/plain");
         assertNotNull(r1);
     }
 
