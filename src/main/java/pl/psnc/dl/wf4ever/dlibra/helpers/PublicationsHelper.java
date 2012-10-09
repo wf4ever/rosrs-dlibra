@@ -279,7 +279,6 @@ public class PublicationsHelper {
     public void deleteVersionPublication(ResearchObject ro)
             throws DLibraException, IOException, TransformerException {
         PublicationId publicationId = new PublicationId(dLibra.getDlROVersionId(ro));
-
         publicationManager.removePublication(publicationId, true, "Research Object Version removed.");
     }
 
@@ -326,7 +325,7 @@ public class PublicationsHelper {
                 return (PublicationId) info.getId();
             }
         }
-        throw new IdNotFoundException(publicationName);
+        return null;
     }
 
 

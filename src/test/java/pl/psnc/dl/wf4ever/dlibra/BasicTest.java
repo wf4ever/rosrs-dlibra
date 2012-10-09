@@ -63,7 +63,9 @@ public class BasicTest {
 
     private static final String USER_PASSWORD = "password";
 
-    private static final ResearchObject RO = new ResearchObject(URI.create("http://example.org/ROs/foobar/"));
+    private static final URI RO_URI = URI.create("http://example.org/ROs/foobar/");
+
+    private ResearchObject ro;
 
 
     /**
@@ -79,6 +81,8 @@ public class BasicTest {
         port = Integer.parseInt(properties.getProperty("port"));
         workspacesDirectory = Long.parseLong(properties.getProperty("workspacesDir"));
         collectionId = Long.parseLong(properties.getProperty("collectionId"));
+
+        ro = new ResearchObject(RO_URI);
     }
 
 
@@ -87,7 +91,7 @@ public class BasicTest {
         try {
             DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                     USER_PASSWORD);
-            dl.deleteResearchObject(RO);
+            dl.deleteResearchObject(ro);
         } catch (Exception e) {
 
         }
@@ -121,9 +125,9 @@ public class BasicTest {
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
-        InputStream in = dl.getFileContents(RO, MAIN_FILE_PATH);
+        InputStream in = dl.getFileContents(ro, MAIN_FILE_PATH);
         try {
             String file = IOUtils.toString(in);
             assertEquals("Manifest is properly saved", MAIN_FILE_CONTENT, file);
@@ -158,10 +162,10 @@ public class BasicTest {
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         try {
-            dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+            dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
                 MAIN_FILE_MIME_TYPE);
             fail("Should throw conflict exception");
         } catch (ConflictException e) {
@@ -181,12 +185,12 @@ public class BasicTest {
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createResearchObject(RO, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         Multimap<URI, Object> atts = HashMultimap.create();
         atts.put(URI.create("a"), "foo");
         atts.put(URI.create("a"), "bar");
         atts.put(URI.create("b"), "lorem ipsum");
-        dl.storeAttributes(RO, atts);
+        dl.storeAttributes(ro, atts);
     }
 }

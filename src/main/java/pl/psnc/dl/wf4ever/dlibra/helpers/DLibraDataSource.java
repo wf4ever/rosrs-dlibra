@@ -330,9 +330,8 @@ public class DLibraDataSource implements DigitalLibrary {
             String mainFileMimeType)
             throws RemoteException, DLibraException, IOException, TransformerException, ConflictException {
         if (getDlROVersionId(ro) == 0) {
-            PublicationId verId = getPublicationsHelper().createVersionPublication(
-                new PublicationId(getDlROVersionId(ro)), ro.getId(), "v1", mainFileContent, mainFilePath,
-                mainFileMimeType);
+            PublicationId verId = getPublicationsHelper().createVersionPublication(new PublicationId(getDlROId(ro)),
+                ro.getId(), "v1", mainFileContent, mainFilePath, mainFileMimeType);
             ro.setDlROVersionId(verId.getId());
         } else {
             throw new ConflictException(ro.getUri().toString());
