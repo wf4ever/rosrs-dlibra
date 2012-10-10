@@ -45,14 +45,16 @@ import pl.psnc.dlibra.user.UserManager;
 import com.google.common.collect.Multimap;
 
 /**
+ * Implementation of the digital library interface based on dLibra.
  * 
- * @author nowakm, piotrhol
+ * @author piotrhol
  * 
  */
 public class DLibraDataSource implements DigitalLibrary {
 
+    /** logger. */
     @SuppressWarnings("unused")
-    private final static Logger LOGGER = Logger.getLogger(DLibraDataSource.class);
+    private static final Logger LOGGER = Logger.getLogger(DLibraDataSource.class);
 
     public static final DirectoryId ROOT_DIRECTORY_ID = new DirectoryId(1L);
 
@@ -95,24 +97,14 @@ public class DLibraDataSource implements DigitalLibrary {
         this.collectionId = new LibCollectionId(collectionId);
 
         metadataServer = DLStaticServiceResolver.getMetadataServer(serviceResolver, null);
-
         contentServer = DLStaticServiceResolver.getContentServer(serviceResolver, null);
-
         userManager = DLStaticServiceResolver.getUserServer(serviceResolver, null).getUserManager();
 
         usersHelper = new UsersHelper(this);
         publicationsHelper = new PublicationsHelper(this);
         filesHelper = new FilesHelper(this);
-        editionHelper = new EditionHelper(this);
+        editionHelper = new EditionHelper(metadataServer.getPublicationManager());
         attributesHelper = new AttributesHelper(this);
-    }
-
-
-    /**
-     * @return the attributesHelper
-     */
-    AttributesHelper getAttributesHelper() {
-        return attributesHelper;
     }
 
 
@@ -133,21 +125,6 @@ public class DLibraDataSource implements DigitalLibrary {
 
     MetadataServer getMetadataServer() {
         return metadataServer;
-    }
-
-
-    UsersHelper getUsersHelper() {
-        return usersHelper;
-    }
-
-
-    PublicationsHelper getPublicationsHelper() {
-        return publicationsHelper;
-    }
-
-
-    FilesHelper getFilesHelper() {
-        return filesHelper;
     }
 
 
@@ -206,7 +183,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public List<String> getResourcePaths(ResearchObject ro, String folder)
             throws DigitalLibraryException, NotFoundException {
         try {
-            return getFilesHelper().getFilePathsInFolder(ro, folder);
+            return filesHelper.getFilePathsInFolder(ro, folder);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {
@@ -219,7 +196,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public InputStream getZippedFolder(ResearchObject ro, String folder)
             throws DigitalLibraryException, NotFoundException {
         try {
-            return getFilesHelper().getZippedFolder(ro, folder);
+            return filesHelper.getZippedFolder(ro, folder);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {
@@ -232,7 +209,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public InputStream getFileContents(ResearchObject ro, String filePath)
             throws DigitalLibraryException, NotFoundException {
         try {
-            return getFilesHelper().getFileContents(ro, filePath);
+            return filesHelper.getFileContents(ro, filePath);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {
@@ -245,7 +222,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public boolean fileExists(ResearchObject ro, String filePath)
             throws DigitalLibraryException {
         try {
-            return getFilesHelper().fileExists(ro, filePath);
+            return filesHelper.fileExists(ro, filePath);
         } catch (IdNotFoundException e) {
             return false;
         } catch (RemoteException | DLibraException e) {
@@ -258,7 +235,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public ResourceInfo createOrUpdateFile(ResearchObject ro, String filePath, InputStream inputStream, String type)
             throws DigitalLibraryException, NotFoundException, AccessDeniedException {
         try {
-            return getFilesHelper().createOrUpdateFile(ro, filePath, inputStream, type);
+            return filesHelper.createOrUpdateFile(ro, filePath, inputStream, type);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (AccessDeniedException e) {
@@ -273,7 +250,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public ResourceInfo getFileInfo(ResearchObject ro, String filePath)
             throws NotFoundException, DigitalLibraryException, AccessDeniedException {
         try {
-            return getFilesHelper().getFileInfo(ro, filePath);
+            return filesHelper.getFileInfo(ro, filePath);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (AccessDeniedException e) {
@@ -288,7 +265,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public void deleteFile(ResearchObject ro, String filePath)
             throws DigitalLibraryException, NotFoundException {
         try {
-            getFilesHelper().deleteFile(ro, filePath);
+            filesHelper.deleteFile(ro, filePath);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (IOException | DLibraException | TransformerException e) {
@@ -300,26 +277,33 @@ public class DLibraDataSource implements DigitalLibrary {
     @Override
     public void createResearchObject(ResearchObject ro, InputStream mainFileContent, String mainFilePath,
             String mainFileMimeType)
-            throws DigitalLibraryException, NotFoundException, ConflictException {
+            throws DigitalLibraryException, ConflictException {
         try {
             createWorkspaceGroupPublication(ro);
             createRoGroupPublication(ro);
-            createVersionPublication(ro, mainFileContent, mainFilePath, mainFileMimeType);
-            getPublicationsHelper().publishPublication(ro);
-        } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            createVersionPublication(ro);
+            createEdition(ro, mainFileContent, mainFilePath, mainFileMimeType);
+            publicationsHelper.publishPublication(ro);
         } catch (IOException | DLibraException | TransformerException e) {
             throw new DigitalLibraryException(e);
         }
     }
 
 
-    private void createVersionPublication(ResearchObject ro, InputStream mainFileContent, String mainFilePath,
+    private void createEdition(ResearchObject ro, InputStream mainFileContent, String mainFilePath,
             String mainFileMimeType)
+            throws AccessDeniedException, IdNotFoundException, RemoteException, DLibraException, TransformerException,
+            IOException {
+        EditionId editionId = publicationsHelper.preparePublicationAsNew(ro.getId(), new PublicationId(
+                getDlROVersionId(ro)), mainFileContent, mainFilePath, mainFileMimeType);
+        ro.setDlEditionId(editionId.getId());
+    }
+
+
+    private void createVersionPublication(ResearchObject ro)
             throws RemoteException, DLibraException, IOException, TransformerException, ConflictException {
         if (getDlROVersionId(ro) == 0) {
-            PublicationId verId = getPublicationsHelper().createVersionPublication(new PublicationId(getDlROId(ro)),
-                ro.getId(), "v1", mainFileContent, mainFilePath, mainFileMimeType);
+            PublicationId verId = publicationsHelper.createVersionPublication(new PublicationId(getDlROId(ro)), "v1");
             ro.setDlROVersionId(verId.getId());
         } else {
             throw new ConflictException(ro.getUri().toString());
@@ -330,8 +314,8 @@ public class DLibraDataSource implements DigitalLibrary {
     private void createRoGroupPublication(ResearchObject ro)
             throws RemoteException, DLibraException {
         if (getDlROId(ro) == 0) {
-            PublicationId roId = getPublicationsHelper().createROGroupPublication(
-                new PublicationId(ro.getDlWorkspaceId()), ro.getId());
+            PublicationId roId = publicationsHelper.createROGroupPublication(new PublicationId(ro.getDlWorkspaceId()),
+                ro.getId());
             ro.setDlROId(roId.getId());
         }
     }
@@ -341,8 +325,8 @@ public class DLibraDataSource implements DigitalLibrary {
             throws RemoteException, DLibraException, IdNotFoundException, AccessDeniedException,
             UnavailableServiceException {
         if (getDlWorkspaceId(ro) == 0) {
-            PublicationId workspaceId = getPublicationsHelper().createWorkspaceGroupPublication("default");
-            getUsersHelper().grantReadAccessToPublication(workspaceId);
+            PublicationId workspaceId = publicationsHelper.createWorkspaceGroupPublication("default");
+            usersHelper.grantReadAccessToPublication(workspaceId);
             ro.setDlWorkspaceId(workspaceId.getId());
         }
     }
@@ -360,7 +344,7 @@ public class DLibraDataSource implements DigitalLibrary {
     long getDlWorkspaceId(ResearchObject ro)
             throws RemoteException, DLibraException {
         if (ro.getDlWorkspaceId() == 0) {
-            PublicationId publicationId = getPublicationsHelper().getGroupId("default");
+            PublicationId publicationId = publicationsHelper.getGroupId("default");
             ro.setDlWorkspaceId(publicationId != null ? publicationId.getId() : 0);
         }
         return ro.getDlWorkspaceId();
@@ -379,8 +363,8 @@ public class DLibraDataSource implements DigitalLibrary {
     long getDlROId(ResearchObject ro)
             throws RemoteException, DLibraException {
         if (ro.getDlROId() == 0) {
-            PublicationId publicationId = getPublicationsHelper().getPublicationId(
-                new PublicationId(getDlWorkspaceId(ro)), ro.getId());
+            PublicationId publicationId = publicationsHelper.getPublicationId(new PublicationId(getDlWorkspaceId(ro)),
+                ro.getId());
             ro.setDlROId(publicationId != null ? publicationId.getId() : 0);
         }
         return ro.getDlROId();
@@ -400,7 +384,7 @@ public class DLibraDataSource implements DigitalLibrary {
             throws RemoteException, DLibraException {
         if (ro.getDlROVersionId() == 0) {
             PublicationId roId = new PublicationId(getDlROId(ro));
-            PublicationId publicationId = getPublicationsHelper().getPublicationId(roId, "v1");
+            PublicationId publicationId = publicationsHelper.getPublicationId(roId, "v1");
             ro.setDlROVersionId(publicationId != null ? publicationId.getId() : 0);
         }
         return ro.getDlROVersionId();
@@ -429,15 +413,15 @@ public class DLibraDataSource implements DigitalLibrary {
 
     @Override
     public void deleteResearchObject(ResearchObject ro)
-            throws DigitalLibraryException, NotFoundException, DLibraException, IOException, TransformerException {
-        getPublicationsHelper().deleteVersionPublication(ro);
-        List<PublicationInfo> vers = getPublicationsHelper().listPublicationsInROGroupPublication(
-            new PublicationId(ro.getDlROVersionId()));
+            throws DigitalLibraryException, NotFoundException, DLibraException, IOException {
+        publicationsHelper.deleteVersionPublication(ro);
+        List<PublicationInfo> vers = publicationsHelper.listPublicationsInROGroupPublication(new PublicationId(ro
+                .getDlROVersionId()));
         if (vers.isEmpty()) {
-            getPublicationsHelper().deleteGroupPublication(new PublicationId(ro.getDlROId()));
-            List<AbstractPublicationInfo> ros = getPublicationsHelper().listROGroupPublications();
+            publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlROId()));
+            List<AbstractPublicationInfo> ros = publicationsHelper.listROGroupPublications();
             if (ros.isEmpty()) {
-                getPublicationsHelper().deleteGroupPublication(new PublicationId(ro.getDlWorkspaceId()));
+                publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlWorkspaceId()));
             }
         }
     }
@@ -447,7 +431,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public boolean createUser(String userId, String password, String username)
             throws DigitalLibraryException, NotFoundException, ConflictException {
         try {
-            return getUsersHelper().createUser(userId, password, username);
+            return usersHelper.createUser(userId, password, username);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (DuplicatedValueException e) {
@@ -462,7 +446,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public boolean userExists(String userId)
             throws DigitalLibraryException {
         try {
-            return getUsersHelper().userExists(userId);
+            return usersHelper.userExists(userId);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
@@ -473,7 +457,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public void deleteUser(String userId)
             throws DigitalLibraryException, NotFoundException {
         try {
-            getUsersHelper().deleteUser(userId);
+            usersHelper.deleteUser(userId);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {
@@ -486,7 +470,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public InputStream getZippedResearchObject(ResearchObject ro)
             throws DigitalLibraryException, NotFoundException {
         try {
-            return getPublicationsHelper().getZippedPublication(ro);
+            return filesHelper.getZippedFolder(ro, null);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {
@@ -499,7 +483,7 @@ public class DLibraDataSource implements DigitalLibrary {
     public void storeAttributes(ResearchObject ro, Multimap<URI, Object> roAttributes)
             throws NotFoundException, DigitalLibraryException {
         try {
-            getAttributesHelper().storeAttributes(ro, roAttributes);
+            attributesHelper.storeAttributes(ro, roAttributes);
         } catch (IdNotFoundException e) {
             throw new NotFoundException(e);
         } catch (RemoteException | DLibraException e) {

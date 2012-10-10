@@ -192,8 +192,7 @@ public class PublicationsHelper {
      * @throws IOException
      * @throws TransformerException
      */
-    public PublicationId createVersionPublication(PublicationId groupId, String groupPublicationName,
-            String publicationName, InputStream mainFileContent, String mainFilePath, String mainFileMimeType)
+    public PublicationId createVersionPublication(PublicationId groupId, String publicationName)
             throws DLibraException, IOException, TransformerException {
         LOGGER.debug(String.format("%s\t\tcreate publication start", new DateTime().toString()));
 
@@ -201,8 +200,6 @@ public class PublicationsHelper {
         LOGGER.debug(String.format("%s\t\tcreate publication prepared new publication", new DateTime().toString()));
         PublicationId publicationId = publicationManager.createPublication(publication);
         LOGGER.debug(String.format("Created publication %s with id %s", publication.getName(), publicationId));
-        preparePublicationAsNew(groupPublicationName, publicationName, publicationId, mainFileContent, mainFilePath,
-            mainFileMimeType);
         LOGGER.debug(String.format("%s\t\tcreate publication prepared as new", new DateTime().toString()));
 
         dLibra.getMetadataServer()
@@ -240,8 +237,8 @@ public class PublicationsHelper {
     }
 
 
-    private EditionId preparePublicationAsNew(String groupPublicationName, String publicationName,
-            PublicationId publicationId, InputStream mainFileContent, String mainFilePath, String mainFileMimeType)
+    public EditionId preparePublicationAsNew(String publicationName, PublicationId publicationId,
+            InputStream mainFileContent, String mainFilePath, String mainFileMimeType)
             throws DLibraException, AccessDeniedException, IdNotFoundException, RemoteException, TransformerException,
             IOException {
         Date creationDate = new Date();
@@ -260,9 +257,7 @@ public class PublicationsHelper {
 
         EditionId editionId = dLibra.getEditionHelper().createEdition(publicationName, publicationId,
             new VersionId[] {});
-
         publicationManager.addEditionVersion(editionId, createdVersion.getId());
-
         return editionId;
     }
 
@@ -274,10 +269,9 @@ public class PublicationsHelper {
      * @param publicationName
      * @throws DLibraException
      * @throws IOException
-     * @throws TransformerException
      */
     public void deleteVersionPublication(ResearchObject ro)
-            throws DLibraException, IOException, TransformerException {
+            throws DLibraException, IOException {
         PublicationId publicationId = new PublicationId(dLibra.getDlROVersionId(ro));
         publicationManager.removePublication(publicationId, true, "Research Object Version removed.");
     }
@@ -333,21 +327,6 @@ public class PublicationsHelper {
             throws RemoteException, DLibraException {
         User userData = userManager.getUserData(dLibra.getUserLogin());
         return userData.getHomedir();
-    }
-
-
-    /**
-     * Returns input stream for a zipped content of a publication.
-     * 
-     * @param groupPublicationName
-     * @param publicationName
-     * @return
-     * @throws RemoteException
-     * @throws DLibraException
-     */
-    public InputStream getZippedPublication(ResearchObject ro)
-            throws RemoteException, DLibraException {
-        return dLibra.getFilesHelper().getZippedFolder(ro, null);
     }
 
 }

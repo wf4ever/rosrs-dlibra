@@ -29,9 +29,9 @@ public class EditionHelper {
     private final PublicationManager publicationManager;
 
 
-    public EditionHelper(DLibraDataSource dLibraDataSource)
+    public EditionHelper(PublicationManager publicationManager)
             throws RemoteException {
-        publicationManager = dLibraDataSource.getMetadataServer().getPublicationManager();
+        this.publicationManager = publicationManager;
     }
 
 
