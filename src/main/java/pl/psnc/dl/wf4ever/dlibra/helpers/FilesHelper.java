@@ -217,18 +217,6 @@ public class FilesHelper {
     }
 
 
-    public String getFileMimeType(ResearchObject ro, String filePath)
-            throws IdNotFoundException, RemoteException, DLibraException {
-        VersionId versionId = getVersionId(ro, filePath);
-        VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(new InputFilter(versionId),
-            new OutputFilter(VersionInfo.class)).getResultInfo();
-        FileInfo fileInfo = (FileInfo) fileManager.getObjects(new FileFilter(versionInfo.getFileId()),
-            new OutputFilter(FileInfo.class)).getResultInfo();
-
-        return fileInfo.getMimeType();
-    }
-
-
     public boolean fileExists(ResearchObject ro, String filePath)
             throws IdNotFoundException, RemoteException, DLibraException {
         return getVersionId(ro, filePath) != null;
@@ -277,7 +265,7 @@ public class FilesHelper {
 
         VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(new InputFilter(versionId),
             new OutputFilter(VersionInfo.class)).getResultInfo();
-        return createResourceInfo(versionInfo, filePath);
+        return createResourceInfo(versionInfo, filePath, mimeType);
     }
 
 
@@ -286,18 +274,20 @@ public class FilesHelper {
         VersionId versionId = getVersionId(ro, filePath);
         VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(new InputFilter(versionId),
             new OutputFilter(VersionInfo.class)).getResultInfo();
-        return createResourceInfo(versionInfo, filePath);
+        FileInfo fileInfo = (FileInfo) fileManager.getObjects(new FileFilter(versionInfo.getFileId()),
+            new OutputFilter(FileInfo.class)).getResultInfo();
+        return createResourceInfo(versionInfo, filePath, fileInfo.getMimeType());
     }
 
 
-    private ResourceInfo createResourceInfo(VersionInfo versionInfo, String filePath)
+    private ResourceInfo createResourceInfo(VersionInfo versionInfo, String filePath, String mimeType)
             throws RemoteException, IdNotFoundException, AccessDeniedException, DLibraException {
         String name = filePath.substring(filePath.lastIndexOf('/') + 1);
         byte[] fileDigest = contentServer.getFileDigest(versionInfo.getId());
         String digest = getHex(fileDigest);
         long size = versionInfo.getSize();
         DateTime lastModified = new DateTime(versionInfo.getLastModificationDate());
-        return new ResourceInfo(name, digest, size, "MD5", lastModified);
+        return new ResourceInfo(name, digest, size, "MD5", lastModified, mimeType);
     }
 
 

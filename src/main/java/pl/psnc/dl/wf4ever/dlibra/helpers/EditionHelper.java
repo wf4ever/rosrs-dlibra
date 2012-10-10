@@ -6,8 +6,6 @@ package pl.psnc.dl.wf4ever.dlibra.helpers;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
-
 import pl.psnc.dlibra.common.DLObject;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -28,16 +26,11 @@ import pl.psnc.dlibra.service.IdNotFoundException;
  */
 public class EditionHelper {
 
-    private final static Logger LOGGER = Logger.getLogger(EditionHelper.class);
-
-    private final DLibraDataSource dLibra;
-
     private final PublicationManager publicationManager;
 
 
     public EditionHelper(DLibraDataSource dLibraDataSource)
             throws RemoteException {
-        this.dLibra = dLibraDataSource;
         publicationManager = dLibraDataSource.getMetadataServer().getPublicationManager();
     }
 

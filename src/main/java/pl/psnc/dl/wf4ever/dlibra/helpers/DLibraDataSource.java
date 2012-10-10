@@ -242,19 +242,6 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public String getFileMimeType(ResearchObject ro, String filePath)
-            throws DigitalLibraryException, NotFoundException {
-        try {
-            return getFilesHelper().getFileMimeType(ro, filePath);
-        } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
-        } catch (RemoteException | DLibraException e) {
-            throw new DigitalLibraryException(e);
-        }
-    }
-
-
-    @Override
     public boolean fileExists(ResearchObject ro, String filePath)
             throws DigitalLibraryException {
         try {
@@ -496,7 +483,7 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public InputStream getZippedVersion(ResearchObject ro)
+    public InputStream getZippedResearchObject(ResearchObject ro)
             throws DigitalLibraryException, NotFoundException {
         try {
             return getPublicationsHelper().getZippedPublication(ro);

@@ -207,17 +207,17 @@ public class FlowTests {
 
 
     private void getFileContent(FileRecord file)
-            throws DigitalLibraryException, IOException, NotFoundException {
+            throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException {
         InputStream f = dl.getFileContents(ro, file.path);
         assertNotNull(f);
         f.close();
-        assertEquals(file.mimeType, dl.getFileMimeType(ro, file.path));
+        assertEquals(file.mimeType, dl.getFileInfo(ro, file.path).getMimeType());
     }
 
 
     private void getZippedVersion()
             throws DigitalLibraryException, NotFoundException {
-        InputStream zip1 = dl.getZippedVersion(ro);
+        InputStream zip1 = dl.getZippedResearchObject(ro);
         assertNotNull(zip1);
     }
 

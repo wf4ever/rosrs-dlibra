@@ -67,10 +67,6 @@ public interface DigitalLibrary {
             throws DigitalLibraryException, NotFoundException;
 
 
-    public String getFileMimeType(ResearchObject ro, String filePath)
-            throws DigitalLibraryException, NotFoundException;
-
-
     public ResourceInfo createOrUpdateFile(ResearchObject ro, String filePath, InputStream inputStream, String type)
             throws DigitalLibraryException, NotFoundException, AccessDeniedException;
 
@@ -142,7 +138,7 @@ public interface DigitalLibrary {
             throws DigitalLibraryException, NotFoundException;
 
 
-    public InputStream getZippedVersion(ResearchObject ro)
+    public InputStream getZippedResearchObject(ResearchObject ro)
             throws DigitalLibraryException, NotFoundException;
 
 
