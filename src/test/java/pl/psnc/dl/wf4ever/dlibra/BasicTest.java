@@ -11,10 +11,7 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.UnknownHostException;
-import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.Properties;
 
@@ -139,8 +136,7 @@ public class BasicTest {
 
     @Test
     public final void testGetUserProfile()
-            throws RemoteException, MalformedURLException, UnknownHostException, DLibraException,
-            DigitalLibraryException, NotFoundException, ConflictException {
+            throws DigitalLibraryException, IOException, NotFoundException {
         DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
@@ -155,8 +151,7 @@ public class BasicTest {
 
     @Test
     public final void testCreateDuplicateVersion()
-            throws RemoteException, MalformedURLException, UnknownHostException, DLibraException,
-            DigitalLibraryException, NotFoundException, ConflictException {
+            throws DigitalLibraryException, IOException, ConflictException {
         DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
@@ -178,8 +173,7 @@ public class BasicTest {
 
     @Test
     public final void testStoreAttributes()
-            throws RemoteException, MalformedURLException, UnknownHostException, DLibraException,
-            DigitalLibraryException, NotFoundException, ConflictException {
+            throws DigitalLibraryException, IOException, ConflictException, NotFoundException {
         DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);

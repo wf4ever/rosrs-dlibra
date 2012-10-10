@@ -35,7 +35,6 @@ import pl.psnc.dlibra.mgmt.UserServiceResolver;
 import pl.psnc.dlibra.service.AccessDeniedException;
 import pl.psnc.dlibra.service.AuthorizationToken;
 import pl.psnc.dlibra.service.DLibraException;
-import pl.psnc.dlibra.service.DuplicatedValueException;
 import pl.psnc.dlibra.service.IdNotFoundException;
 import pl.psnc.dlibra.service.ServiceUrl;
 import pl.psnc.dlibra.system.UserInterface;
@@ -85,20 +84,46 @@ public class DLibraDataSource implements DigitalLibrary {
     private final LibCollectionId collectionId;
 
 
+    /**
+     * Constructor.
+     * 
+     * @param host
+     *            dLibra server host
+     * @param port
+     *            dLibra server RMI port
+     * @param workspacesContainerDirectoryId
+     *            dLibra directory id in which all content is stored
+     * @param collectionId
+     *            id of collection that will have all published ROs
+     * @param userLogin
+     *            user login
+     * @param password
+     *            user password
+     * @throws DigitalLibraryException
+     *             internal dLibra error
+     * @throws IOException
+     *             error connecting to dLibra
+     */
     public DLibraDataSource(String host, int port, long workspacesContainerDirectoryId, long collectionId,
             String userLogin, String password)
-            throws RemoteException, DLibraException, MalformedURLException, UnknownHostException {
-        AuthorizationToken authorizationToken = new AuthorizationToken(userLogin, password);
-        serviceResolver = new UserServiceResolver(new ServiceUrl(InetAddress.getByName(host),
-                UserInterface.SERVICE_TYPE, port), authorizationToken);
+            throws DigitalLibraryException, IOException {
+        try {
+            AuthorizationToken authorizationToken = new AuthorizationToken(userLogin, password);
+            serviceResolver = new UserServiceResolver(new ServiceUrl(InetAddress.getByName(host),
+                    UserInterface.SERVICE_TYPE, port), authorizationToken);
 
-        this.userLogin = userLogin;
-        this.workspacesContainerDirectoryId = new DirectoryId(workspacesContainerDirectoryId);
-        this.collectionId = new LibCollectionId(collectionId);
+            this.userLogin = userLogin;
+            this.workspacesContainerDirectoryId = new DirectoryId(workspacesContainerDirectoryId);
+            this.collectionId = new LibCollectionId(collectionId);
 
-        metadataServer = DLStaticServiceResolver.getMetadataServer(serviceResolver, null);
-        contentServer = DLStaticServiceResolver.getContentServer(serviceResolver, null);
-        userManager = DLStaticServiceResolver.getUserServer(serviceResolver, null).getUserManager();
+            metadataServer = DLStaticServiceResolver.getMetadataServer(serviceResolver, null);
+            contentServer = DLStaticServiceResolver.getContentServer(serviceResolver, null);
+            userManager = DLStaticServiceResolver.getUserServer(serviceResolver, null).getUserManager();
+        } catch (DLibraException e) {
+            throw new DigitalLibraryException(e);
+        } catch (MalformedURLException | UnknownHostException e) {
+            throw new IOException(e);
+        }
 
         usersHelper = new UsersHelper(this);
         publicationsHelper = new PublicationsHelper(this);
@@ -413,29 +438,32 @@ public class DLibraDataSource implements DigitalLibrary {
 
     @Override
     public void deleteResearchObject(ResearchObject ro)
-            throws DigitalLibraryException, NotFoundException, DLibraException, IOException {
-        publicationsHelper.deleteVersionPublication(ro);
-        List<PublicationInfo> vers = publicationsHelper.listPublicationsInROGroupPublication(new PublicationId(ro
-                .getDlROVersionId()));
-        if (vers.isEmpty()) {
-            publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlROId()));
-            List<AbstractPublicationInfo> ros = publicationsHelper.listROGroupPublications();
-            if (ros.isEmpty()) {
-                publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlWorkspaceId()));
+            throws DigitalLibraryException, NotFoundException {
+        try {
+            publicationsHelper.deleteVersionPublication(ro);
+            List<PublicationInfo> vers = publicationsHelper.listPublicationsInROGroupPublication(new PublicationId(ro
+                    .getDlROVersionId()));
+            if (vers.isEmpty()) {
+                publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlROId()));
+                List<AbstractPublicationInfo> ros = publicationsHelper.listROGroupPublications();
+                if (ros.isEmpty()) {
+                    publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlWorkspaceId()));
+                }
             }
+        } catch (IdNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (IOException | DLibraException e) {
+            throw new DigitalLibraryException(e);
         }
+
     }
 
 
     @Override
     public boolean createUser(String userId, String password, String username)
-            throws DigitalLibraryException, NotFoundException, ConflictException {
+            throws DigitalLibraryException {
         try {
             return usersHelper.createUser(userId, password, username);
-        } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
-        } catch (DuplicatedValueException e) {
-            throw new ConflictException(e);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
