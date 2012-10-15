@@ -22,6 +22,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import pl.psnc.dl.wf4ever.common.HibernateUtil;
 import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.UserProfile;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
@@ -71,6 +72,7 @@ public class BasicTest {
     @Before
     public void setUp()
             throws Exception {
+        HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         InputStream inputStream = BasicTest.class.getClassLoader().getResourceAsStream("connection.properties");
         Properties properties = new Properties();
         properties.load(inputStream);
@@ -99,7 +101,7 @@ public class BasicTest {
         } catch (Exception e) {
 
         }
-
+        HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
     }
 
 

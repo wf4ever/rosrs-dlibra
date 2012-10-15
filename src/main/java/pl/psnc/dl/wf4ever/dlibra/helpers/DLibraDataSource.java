@@ -322,6 +322,7 @@ public class DLibraDataSource implements DigitalLibrary {
         EditionId editionId = publicationsHelper.preparePublicationAsNew(ro.getId(), new PublicationId(
                 getDlROVersionId(ro)), mainFileContent, mainFilePath, mainFileMimeType);
         ro.setDlEditionId(editionId.getId());
+        ro.save();
     }
 
 
@@ -330,6 +331,7 @@ public class DLibraDataSource implements DigitalLibrary {
         if (getDlROVersionId(ro) == 0) {
             PublicationId verId = publicationsHelper.createVersionPublication(new PublicationId(getDlROId(ro)), "v1");
             ro.setDlROVersionId(verId.getId());
+            ro.save();
         } else {
             throw new ConflictException(ro.getUri().toString());
         }
@@ -342,6 +344,7 @@ public class DLibraDataSource implements DigitalLibrary {
             PublicationId roId = publicationsHelper.createROGroupPublication(new PublicationId(ro.getDlWorkspaceId()),
                 ro.getId());
             ro.setDlROId(roId.getId());
+            ro.save();
         }
     }
 
@@ -353,6 +356,7 @@ public class DLibraDataSource implements DigitalLibrary {
             PublicationId workspaceId = publicationsHelper.createWorkspaceGroupPublication("default");
             usersHelper.grantReadAccessToPublication(workspaceId);
             ro.setDlWorkspaceId(workspaceId.getId());
+            ro.save();
         }
     }
 
@@ -371,6 +375,7 @@ public class DLibraDataSource implements DigitalLibrary {
         if (ro.getDlWorkspaceId() == 0) {
             PublicationId publicationId = publicationsHelper.getGroupId("default");
             ro.setDlWorkspaceId(publicationId != null ? publicationId.getId() : 0);
+            ro.save();
         }
         return ro.getDlWorkspaceId();
     }
@@ -391,6 +396,7 @@ public class DLibraDataSource implements DigitalLibrary {
             PublicationId publicationId = publicationsHelper.getPublicationId(new PublicationId(getDlWorkspaceId(ro)),
                 ro.getId());
             ro.setDlROId(publicationId != null ? publicationId.getId() : 0);
+            ro.save();
         }
         return ro.getDlROId();
     }
@@ -411,6 +417,7 @@ public class DLibraDataSource implements DigitalLibrary {
             PublicationId roId = new PublicationId(getDlROId(ro));
             PublicationId publicationId = publicationsHelper.getPublicationId(roId, "v1");
             ro.setDlROVersionId(publicationId != null ? publicationId.getId() : 0);
+            ro.save();
         }
         return ro.getDlROVersionId();
     }
@@ -431,6 +438,7 @@ public class DLibraDataSource implements DigitalLibrary {
             long versionIdLong = getDlROVersionId(ro);
             EditionId editionId = (EditionId) editionHelper.getLastEdition(new PublicationId(versionIdLong)).getId();
             ro.setDlEditionId(editionId != null ? editionId.getId() : 0);
+            ro.save();
         }
         return ro.getDlEditionId();
     }

@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import pl.psnc.dl.wf4ever.common.HibernateUtil;
 import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.ResourceInfo;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
@@ -92,8 +93,7 @@ public class FlowTests {
      * @throws java.lang.Exception
      */
     @AfterClass
-    public static void tearDownAfterClass()
-            throws Exception {
+    public static void tearDownAfterClass() {
     }
 
 
@@ -103,6 +103,7 @@ public class FlowTests {
     @Before
     public void setUp()
             throws Exception {
+        HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         userId = "test-" + new Date().getTime();
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.createUser(userId, USER_PASSWORD, USERNAME);
@@ -127,6 +128,7 @@ public class FlowTests {
         dl.deleteResearchObject(ro);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.deleteUser(userId);
+        HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
     }
 
 
