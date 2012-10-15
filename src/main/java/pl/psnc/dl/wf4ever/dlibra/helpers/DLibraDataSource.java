@@ -24,6 +24,7 @@ import pl.psnc.dl.wf4ever.dlibra.NotFoundException;
 import pl.psnc.dlibra.content.ContentServer;
 import pl.psnc.dlibra.metadata.AbstractPublicationInfo;
 import pl.psnc.dlibra.metadata.DirectoryId;
+import pl.psnc.dlibra.metadata.Edition;
 import pl.psnc.dlibra.metadata.EditionId;
 import pl.psnc.dlibra.metadata.LibCollectionId;
 import pl.psnc.dlibra.metadata.MetadataServer;
@@ -436,8 +437,8 @@ public class DLibraDataSource implements DigitalLibrary {
             throws RemoteException, DLibraException {
         if (ro.getDlEditionId() == 0) {
             long versionIdLong = getDlROVersionId(ro);
-            EditionId editionId = (EditionId) editionHelper.getLastEdition(new PublicationId(versionIdLong)).getId();
-            ro.setDlEditionId(editionId != null ? editionId.getId() : 0);
+            Edition edition = (Edition) editionHelper.getLastEdition(new PublicationId(versionIdLong));
+            ro.setDlEditionId(edition != null ? edition.getId().getId() : 0);
             ro.save();
         }
         return ro.getDlEditionId();
