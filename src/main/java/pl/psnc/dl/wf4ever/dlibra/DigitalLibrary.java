@@ -10,7 +10,6 @@ import java.util.List;
 import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.ResourceInfo;
 import pl.psnc.dl.wf4ever.common.UserProfile;
-import pl.psnc.dlibra.service.AccessDeniedException;
 
 import com.google.common.collect.Multimap;
 
@@ -189,10 +188,12 @@ public interface DigitalLibrary {
      *             dLibra error
      * @throws ConflictException
      *             a research object with the given id already exists
+     * @throws AccessDeniedException
+     *             no rights to add objects to DL
      */
     void createResearchObject(ResearchObject ro, InputStream mainFileContent, String mainFilePath,
             String mainFileMimeType)
-            throws DigitalLibraryException, ConflictException;
+            throws DigitalLibraryException, ConflictException, AccessDeniedException;
 
 
     /**

@@ -25,8 +25,6 @@ import pl.psnc.dl.wf4ever.common.HibernateUtil;
 import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.ResourceInfo;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
-import pl.psnc.dlibra.service.AccessDeniedException;
-import pl.psnc.dlibra.service.DLibraException;
 
 /**
  * @author piotrek
@@ -166,7 +164,7 @@ public class FlowTests {
 
     @Test
     public final void testPermissions()
-            throws DigitalLibraryException, IOException, NotFoundException, ConflictException, DLibraException {
+            throws DigitalLibraryException, IOException, NotFoundException, ConflictException, AccessDeniedException {
         createOrUpdateFile(files[0]);
         createOrUpdateFile(files[1]);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, READER_LOGIN, READER_PASSWORD);

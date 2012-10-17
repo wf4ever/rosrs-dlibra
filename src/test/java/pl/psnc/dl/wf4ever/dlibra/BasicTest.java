@@ -26,7 +26,6 @@ import pl.psnc.dl.wf4ever.common.HibernateUtil;
 import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.UserProfile;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
-import pl.psnc.dlibra.service.DLibraException;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -110,15 +109,15 @@ public class BasicTest {
      * {@link pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource#createVersion(java.lang.String, java.lang.String, java.lang.String, java.net.URI)}
      * .
      * 
-     * @throws DLibraException
      * @throws DigitalLibraryException
      * @throws ConflictException
      * @throws NotFoundException
      * @throws IOException
+     * @throws AccessDeniedException
      */
     @Test
     public final void testCreateVersionStringStringStringURI()
-            throws DLibraException, DigitalLibraryException, NotFoundException, ConflictException, IOException {
+            throws DigitalLibraryException, NotFoundException, ConflictException, IOException, AccessDeniedException {
         DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
@@ -151,7 +150,7 @@ public class BasicTest {
 
     @Test
     public final void testCreateDuplicateVersion()
-            throws DigitalLibraryException, IOException, ConflictException {
+            throws DigitalLibraryException, IOException, ConflictException, AccessDeniedException {
         DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
@@ -172,7 +171,7 @@ public class BasicTest {
 
     @Test
     public final void testStoreAttributes()
-            throws DigitalLibraryException, IOException, ConflictException, NotFoundException {
+            throws DigitalLibraryException, IOException, ConflictException, NotFoundException, AccessDeniedException {
         DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
