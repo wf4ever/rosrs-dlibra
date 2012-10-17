@@ -11,10 +11,7 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.UnknownHostException;
-import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.Properties;
 
@@ -25,6 +22,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import pl.psnc.dl.wf4ever.common.HibernateUtil;
+import pl.psnc.dl.wf4ever.common.ResearchObject;
+import pl.psnc.dl.wf4ever.common.UserProfile;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
 import pl.psnc.dlibra.service.DLibraException;
 
@@ -61,6 +61,10 @@ public class BasicTest {
 
     private static final String USER_PASSWORD = "password";
 
+    private static final URI RO_URI = URI.create("http://example.org/ROs/foobar/");
+
+    private ResearchObject ro;
+
 
     /**
      * @throws java.lang.Exception
@@ -68,6 +72,7 @@ public class BasicTest {
     @Before
     public void setUp()
             throws Exception {
+        HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         InputStream inputStream = BasicTest.class.getClassLoader().getResourceAsStream("connection.properties");
         Properties properties = new Properties();
         properties.load(inputStream);
@@ -75,6 +80,8 @@ public class BasicTest {
         port = Integer.parseInt(properties.getProperty("port"));
         workspacesDirectory = Long.parseLong(properties.getProperty("workspacesDir"));
         collectionId = Long.parseLong(properties.getProperty("collectionId"));
+
+        ro = new ResearchObject(RO_URI);
     }
 
 
@@ -83,7 +90,7 @@ public class BasicTest {
         try {
             DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                     USER_PASSWORD);
-            dl.deleteWorkspace("w");
+            dl.deleteResearchObject(ro);
         } catch (Exception e) {
 
         }
@@ -94,7 +101,7 @@ public class BasicTest {
         } catch (Exception e) {
 
         }
-
+        HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
     }
 
 
@@ -117,11 +124,9 @@ public class BasicTest {
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
-        InputStream in = dl.getFileContents("w", "r", "v", MAIN_FILE_PATH);
+        InputStream in = dl.getFileContents(ro, MAIN_FILE_PATH);
         try {
             String file = IOUtils.toString(in);
             assertEquals("Manifest is properly saved", MAIN_FILE_CONTENT, file);
@@ -133,8 +138,7 @@ public class BasicTest {
 
     @Test
     public final void testGetUserProfile()
-            throws RemoteException, MalformedURLException, UnknownHostException, DLibraException,
-            DigitalLibraryException, NotFoundException, ConflictException {
+            throws DigitalLibraryException, IOException, NotFoundException {
         DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
@@ -149,43 +153,18 @@ public class BasicTest {
 
     @Test
     public final void testCreateDuplicateVersion()
-            throws RemoteException, MalformedURLException, UnknownHostException, DLibraException,
-            DigitalLibraryException, NotFoundException, ConflictException {
+            throws DigitalLibraryException, IOException, ConflictException {
         DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         try {
-            dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+            dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
                 MAIN_FILE_MIME_TYPE);
-            fail("Should throw some exception");
-        } catch (ConflictException e) {
-            // good
-        } catch (Exception e) {
-            fail("Threw a wrong exception: " + e.getClass().toString());
-        }
-    }
-
-
-    @Test
-    public final void testCreateDuplicateRO()
-            throws RemoteException, MalformedURLException, UnknownHostException, DLibraException,
-            DigitalLibraryException, NotFoundException, ConflictException {
-        DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
-                ADMIN_PASSWORD);
-        dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
-        DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
-                USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        try {
-            dl.createResearchObject("w", "r");
-            fail("Should throw some exception");
+            fail("Should throw conflict exception");
         } catch (ConflictException e) {
             // good
         } catch (Exception e) {
@@ -196,21 +175,18 @@ public class BasicTest {
 
     @Test
     public final void testStoreAttributes()
-            throws RemoteException, MalformedURLException, UnknownHostException, DLibraException,
-            DigitalLibraryException, NotFoundException, ConflictException {
+            throws DigitalLibraryException, IOException, ConflictException, NotFoundException {
         DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
         DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                 USER_PASSWORD);
-        dl.createWorkspace("w");
-        dl.createResearchObject("w", "r");
-        dl.createVersion("w", "r", "v", new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+        dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         Multimap<URI, Object> atts = HashMultimap.create();
         atts.put(URI.create("a"), "foo");
         atts.put(URI.create("a"), "bar");
         atts.put(URI.create("b"), "lorem ipsum");
-        dl.storeAttributes("w", "r", "v", atts);
+        dl.storeAttributes(ro, atts);
     }
 }
