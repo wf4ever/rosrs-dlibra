@@ -56,7 +56,7 @@ public class FlowTests {
 
     private static final String USERNAME = "John Doe";
 
-    private DLibraDataSource dl;
+    private DigitalLibrary dl;
 
     private static final FileRecord[] files = new FileRecord[3];
 
