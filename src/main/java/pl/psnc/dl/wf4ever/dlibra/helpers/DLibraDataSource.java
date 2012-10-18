@@ -320,7 +320,7 @@ public class DLibraDataSource implements DigitalLibrary {
             String mainFileMimeType)
             throws AccessDeniedException, IdNotFoundException, RemoteException, DLibraException, TransformerException,
             IOException {
-        EditionId editionId = publicationsHelper.preparePublicationAsNew(ro.getId(), new PublicationId(
+        EditionId editionId = publicationsHelper.preparePublicationAsNew(getRoId(ro), new PublicationId(
                 getDlROVersionId(ro)), mainFileContent, mainFilePath, mainFileMimeType);
         ro.setDlEditionId(editionId.getId());
         ro.save();
@@ -343,7 +343,7 @@ public class DLibraDataSource implements DigitalLibrary {
             throws RemoteException, DLibraException {
         if (getDlROId(ro) == 0) {
             PublicationId roId = publicationsHelper.createROGroupPublication(new PublicationId(ro.getDlWorkspaceId()),
-                ro.getId());
+                getRoId(ro));
             ro.setDlROId(roId.getId());
             ro.save();
         }
@@ -395,7 +395,7 @@ public class DLibraDataSource implements DigitalLibrary {
             throws RemoteException, DLibraException {
         if (ro.getDlROId() == 0) {
             PublicationId publicationId = publicationsHelper.getPublicationId(new PublicationId(getDlWorkspaceId(ro)),
-                ro.getId());
+                getRoId(ro));
             ro.setDlROId(publicationId != null ? publicationId.getId() : 0);
             ro.save();
         }
@@ -527,6 +527,15 @@ public class DLibraDataSource implements DigitalLibrary {
             throw new DigitalLibraryException(e);
         }
 
+    }
+
+
+    private static String getRoId(ResearchObject ro) {
+        if (ro.getUri().getPath() == null) {
+            return null;
+        }
+        String segments[] = ro.getUri().getPath().split("/");
+        return segments[segments.length - 1];
     }
 
 }
