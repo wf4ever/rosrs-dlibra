@@ -106,9 +106,13 @@ public class FlowTests {
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.createUser(userId, USER_PASSWORD, USERNAME);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
-        ro = new ResearchObject(RO_URI);
-        dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
-            MAIN_FILE_MIME_TYPE);
+        ro = ResearchObject.create(RO_URI);
+        try {
+            dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
+                MAIN_FILE_MIME_TYPE);
+        } catch (ConflictException e) {
+            //nothing
+        }
 
         files[0] = new FileRecord("file1.txt", "file1.txt", "text/plain");
         files[1] = new FileRecord("file2.txt", "dir/file2.txt", "text/plain");
