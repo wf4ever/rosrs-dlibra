@@ -80,8 +80,7 @@ public class BasicTest {
         port = Integer.parseInt(properties.getProperty("port"));
         workspacesDirectory = Long.parseLong(properties.getProperty("workspacesDir"));
         collectionId = Long.parseLong(properties.getProperty("collectionId"));
-
-        ro = new ResearchObject(RO_URI);
+        ro = ResearchObject.create(RO_URI);
     }
 
 
