@@ -80,6 +80,11 @@ public class BasicTest {
         workspacesDirectory = Long.parseLong(properties.getProperty("workspacesDir"));
         collectionId = Long.parseLong(properties.getProperty("collectionId"));
 
+        ro = ResearchObject.findByUri(RO_URI);
+        if (ro != null) {
+            ro.delete();
+            HibernateUtil.getSessionFactory().getCurrentSession().flush();
+        }
         ro = ResearchObject.create(RO_URI);
     }
 
