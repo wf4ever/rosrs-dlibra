@@ -25,8 +25,6 @@ import pl.psnc.dl.wf4ever.common.HibernateUtil;
 import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.ResourceInfo;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
-import pl.psnc.dlibra.service.AccessDeniedException;
-import pl.psnc.dlibra.service.DLibraException;
 
 /**
  * @author piotrek
@@ -56,7 +54,7 @@ public class FlowTests {
 
     private static final String USERNAME = "John Doe";
 
-    private DLibraDataSource dl;
+    private DigitalLibrary dl;
 
     private static final FileRecord[] files = new FileRecord[3];
 
@@ -108,6 +106,16 @@ public class FlowTests {
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.createUser(userId, USER_PASSWORD, USERNAME);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
+        ro = ResearchObject.findByUri(RO_URI);
+        if (ro != null) {
+            try {
+                dl.deleteResearchObject(ro);
+            } catch (NotFoundException e) {
+                //nothing
+            }
+            ro.delete();
+            HibernateUtil.getSessionFactory().getCurrentSession().flush();
+        }
         ro = ResearchObject.create(RO_URI);
         dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
@@ -125,7 +133,6 @@ public class FlowTests {
     public void tearDown()
             throws Exception {
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
-        dl.deleteResearchObject(ro);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.deleteUser(userId);
         HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
@@ -166,7 +173,7 @@ public class FlowTests {
 
     @Test
     public final void testPermissions()
-            throws DigitalLibraryException, IOException, NotFoundException, ConflictException, DLibraException {
+            throws DigitalLibraryException, IOException, NotFoundException, ConflictException, AccessDeniedException {
         createOrUpdateFile(files[0]);
         createOrUpdateFile(files[1]);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, READER_LOGIN, READER_PASSWORD);

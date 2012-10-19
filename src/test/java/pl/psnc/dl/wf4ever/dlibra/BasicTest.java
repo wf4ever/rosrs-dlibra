@@ -26,7 +26,6 @@ import pl.psnc.dl.wf4ever.common.HibernateUtil;
 import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.UserProfile;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
-import pl.psnc.dlibra.service.DLibraException;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -80,6 +79,11 @@ public class BasicTest {
         port = Integer.parseInt(properties.getProperty("port"));
         workspacesDirectory = Long.parseLong(properties.getProperty("workspacesDir"));
         collectionId = Long.parseLong(properties.getProperty("collectionId"));
+        ro = ResearchObject.findByUri(RO_URI);
+        if (ro != null) {
+            ro.delete();
+            HibernateUtil.getSessionFactory().getCurrentSession().flush();
+        }
         ro = ResearchObject.create(RO_URI);
     }
 
@@ -87,14 +91,14 @@ public class BasicTest {
     @After
     public void tearDown() {
         try {
-            DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
+            DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
                     USER_PASSWORD);
             dl.deleteResearchObject(ro);
         } catch (Exception e) {
 
         }
         try {
-            DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
+            DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                     ADMIN_PASSWORD);
             dlA.deleteUser(USER_ID);
         } catch (Exception e) {
@@ -109,20 +113,19 @@ public class BasicTest {
      * {@link pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource#createVersion(java.lang.String, java.lang.String, java.lang.String, java.net.URI)}
      * .
      * 
-     * @throws DLibraException
      * @throws DigitalLibraryException
      * @throws ConflictException
      * @throws NotFoundException
      * @throws IOException
+     * @throws AccessDeniedException
      */
     @Test
     public final void testCreateVersionStringStringStringURI()
-            throws DLibraException, DigitalLibraryException, NotFoundException, ConflictException, IOException {
-        DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
+            throws DigitalLibraryException, NotFoundException, ConflictException, IOException, AccessDeniedException {
+        DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
-        DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
-                USER_PASSWORD);
+        DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
         dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         InputStream in = dl.getFileContents(ro, MAIN_FILE_PATH);
@@ -138,12 +141,11 @@ public class BasicTest {
     @Test
     public final void testGetUserProfile()
             throws DigitalLibraryException, IOException, NotFoundException {
-        DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
+        DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
         assertFalse(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
-        DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
-                USER_PASSWORD);
+        DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
         UserProfile user = dl.getUserProfile();
         Assert.assertEquals("User login is equal", USER_ID, user.getLogin());
         Assert.assertEquals("User name is equal", USERNAME, user.getName());
@@ -152,12 +154,11 @@ public class BasicTest {
 
     @Test
     public final void testCreateDuplicateVersion()
-            throws DigitalLibraryException, IOException, ConflictException {
-        DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
+            throws DigitalLibraryException, IOException, ConflictException, AccessDeniedException {
+        DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
-        DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
-                USER_PASSWORD);
+        DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
         dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         try {
@@ -174,12 +175,11 @@ public class BasicTest {
 
     @Test
     public final void testStoreAttributes()
-            throws DigitalLibraryException, IOException, ConflictException, NotFoundException {
-        DLibraDataSource dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
+            throws DigitalLibraryException, IOException, ConflictException, NotFoundException, AccessDeniedException {
+        DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
         dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
-        DLibraDataSource dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID,
-                USER_PASSWORD);
+        DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
         dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
         Multimap<URI, Object> atts = HashMultimap.create();
