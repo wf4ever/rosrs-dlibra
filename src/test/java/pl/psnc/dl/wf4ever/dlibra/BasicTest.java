@@ -25,6 +25,11 @@ import org.junit.Test;
 import pl.psnc.dl.wf4ever.common.HibernateUtil;
 import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.UserProfile;
+import pl.psnc.dl.wf4ever.dl.AccessDeniedException;
+import pl.psnc.dl.wf4ever.dl.ConflictException;
+import pl.psnc.dl.wf4ever.dl.DigitalLibrary;
+import pl.psnc.dl.wf4ever.dl.DigitalLibraryException;
+import pl.psnc.dl.wf4ever.dl.NotFoundException;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
 
 import com.google.common.collect.HashMultimap;

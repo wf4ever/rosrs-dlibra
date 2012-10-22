@@ -17,11 +17,11 @@ import pl.psnc.dl.wf4ever.common.ResearchObject;
 import pl.psnc.dl.wf4ever.common.ResourceInfo;
 import pl.psnc.dl.wf4ever.common.UserProfile;
 import pl.psnc.dl.wf4ever.common.UserProfile.Role;
-import pl.psnc.dl.wf4ever.dlibra.AccessDeniedException;
-import pl.psnc.dl.wf4ever.dlibra.ConflictException;
-import pl.psnc.dl.wf4ever.dlibra.DigitalLibrary;
-import pl.psnc.dl.wf4ever.dlibra.DigitalLibraryException;
-import pl.psnc.dl.wf4ever.dlibra.NotFoundException;
+import pl.psnc.dl.wf4ever.dl.AccessDeniedException;
+import pl.psnc.dl.wf4ever.dl.ConflictException;
+import pl.psnc.dl.wf4ever.dl.DigitalLibrary;
+import pl.psnc.dl.wf4ever.dl.DigitalLibraryException;
+import pl.psnc.dl.wf4ever.dl.NotFoundException;
 import pl.psnc.dlibra.content.ContentServer;
 import pl.psnc.dlibra.metadata.AbstractPublicationInfo;
 import pl.psnc.dlibra.metadata.DirectoryId;
@@ -188,7 +188,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             user = userManager.getUserData(login);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("User profile not found", e);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
@@ -211,7 +211,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             return filesHelper.getFilePathsInFolder(ro, folder);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
@@ -224,7 +224,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             return filesHelper.getZippedFolder(ro, folder);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
@@ -237,7 +237,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             return filesHelper.getFileContents(ro, filePath);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
@@ -263,7 +263,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             return filesHelper.createOrUpdateFile(ro, filePath, inputStream, type);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (pl.psnc.dlibra.service.AccessDeniedException e) {
             throw new AccessDeniedException(e.getMessage(), e);
         } catch (IOException | DLibraException | TransformerException e) {
@@ -278,7 +278,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             return filesHelper.getFileInfo(ro, filePath);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (pl.psnc.dlibra.service.AccessDeniedException e) {
             throw new AccessDeniedException(e.getMessage(), e);
         } catch (IOException | DLibraException e) {
@@ -293,7 +293,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             filesHelper.deleteFile(ro, filePath);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (IOException | DLibraException | TransformerException e) {
             throw new DigitalLibraryException(e);
         }
@@ -460,7 +460,7 @@ public class DLibraDataSource implements DigitalLibrary {
                 }
             }
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (IOException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
@@ -496,7 +496,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             usersHelper.deleteUser(userId);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
@@ -509,7 +509,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             return filesHelper.getZippedFolder(ro, null);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
@@ -522,7 +522,7 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             attributesHelper.storeAttributes(ro, roAttributes);
         } catch (IdNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }
