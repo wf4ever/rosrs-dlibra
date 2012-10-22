@@ -287,7 +287,7 @@ public class FilesHelper {
         String digest = getHex(fileDigest);
         long size = versionInfo.getSize();
         DateTime lastModified = new DateTime(versionInfo.getLastModificationDate());
-        return new ResourceInfo(name, digest, size, "MD5", lastModified, mimeType);
+        return ResourceInfo.create(filePath, name, digest, size, "MD5", lastModified, mimeType);
     }
 
 
