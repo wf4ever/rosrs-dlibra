@@ -84,7 +84,6 @@ public class BasicTest {
         port = Integer.parseInt(properties.getProperty("port"));
         workspacesDirectory = Long.parseLong(properties.getProperty("workspacesDir"));
         collectionId = Long.parseLong(properties.getProperty("collectionId"));
-
         ro = ResearchObject.findByUri(RO_URI);
         if (ro != null) {
             ro.delete();
