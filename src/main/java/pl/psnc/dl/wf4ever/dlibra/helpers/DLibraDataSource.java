@@ -206,19 +206,6 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public List<String> getResourcePaths(ResearchObject ro, String folder)
-            throws DigitalLibraryException, NotFoundException {
-        try {
-            return filesHelper.getFilePathsInFolder(ro, folder);
-        } catch (IdNotFoundException e) {
-            throw new NotFoundException("Something was not found", e);
-        } catch (RemoteException | DLibraException e) {
-            throw new DigitalLibraryException(e);
-        }
-    }
-
-
-    @Override
     public InputStream getZippedFolder(ResearchObject ro, String folder)
             throws DigitalLibraryException, NotFoundException {
         try {
