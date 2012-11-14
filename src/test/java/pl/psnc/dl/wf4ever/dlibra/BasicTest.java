@@ -22,14 +22,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import pl.psnc.dl.wf4ever.common.HibernateUtil;
-import pl.psnc.dl.wf4ever.common.ResearchObject;
-import pl.psnc.dl.wf4ever.common.UserProfile;
 import pl.psnc.dl.wf4ever.dl.AccessDeniedException;
 import pl.psnc.dl.wf4ever.dl.ConflictException;
 import pl.psnc.dl.wf4ever.dl.DigitalLibrary;
 import pl.psnc.dl.wf4ever.dl.DigitalLibraryException;
+import pl.psnc.dl.wf4ever.dl.DigitalPublication;
 import pl.psnc.dl.wf4ever.dl.NotFoundException;
+import pl.psnc.dl.wf4ever.dl.UserMetadata;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
 
 import com.google.common.collect.HashMultimap;
@@ -67,7 +66,7 @@ public class BasicTest {
 
     private static final URI RO_URI = URI.create("http://example.org/ROs/foobar/");
 
-    private ResearchObject ro;
+    private DigitalPublication ro;
 
 
     /**
@@ -76,7 +75,6 @@ public class BasicTest {
     @Before
     public void setUp()
             throws Exception {
-        HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         InputStream inputStream = BasicTest.class.getClassLoader().getResourceAsStream("connection.properties");
         Properties properties = new Properties();
         properties.load(inputStream);
@@ -84,12 +82,7 @@ public class BasicTest {
         port = Integer.parseInt(properties.getProperty("port"));
         workspacesDirectory = Long.parseLong(properties.getProperty("workspacesDir"));
         collectionId = Long.parseLong(properties.getProperty("collectionId"));
-        ro = ResearchObject.findByUri(RO_URI);
-        if (ro != null) {
-            ro.delete();
-            HibernateUtil.getSessionFactory().getCurrentSession().flush();
-        }
-        ro = ResearchObject.create(RO_URI);
+        ro = new ResearchObject(RO_URI);
     }
 
 
@@ -109,7 +102,6 @@ public class BasicTest {
         } catch (Exception e) {
 
         }
-        HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
     }
 
 
@@ -151,7 +143,7 @@ public class BasicTest {
         assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
         assertFalse(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
         DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
-        UserProfile user = dl.getUserProfile();
+        UserMetadata user = ((DLibraDataSource) dl).getUserProfile();
         Assert.assertEquals("User login is equal", USER_ID, user.getLogin());
         Assert.assertEquals("User name is equal", USERNAME, user.getName());
     }

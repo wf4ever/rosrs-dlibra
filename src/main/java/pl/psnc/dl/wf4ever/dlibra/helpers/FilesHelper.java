@@ -21,8 +21,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
-import pl.psnc.dl.wf4ever.common.ResourceInfo;
 import pl.psnc.dl.wf4ever.dl.DigitalPublication;
+import pl.psnc.dl.wf4ever.dl.ResourceMetadata;
 import pl.psnc.dlibra.common.Id;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -239,7 +239,7 @@ public class FilesHelper {
     }
 
 
-    public ResourceInfo createOrUpdateFile(DigitalPublication ro, String filePath, InputStream inputStream,
+    public ResourceMetadata createOrUpdateFile(DigitalPublication ro, String filePath, InputStream inputStream,
             String mimeType)
             throws IOException, DLibraException, TransformerException {
         PublicationId roVersionId = new PublicationId(dLibra.getDlROVersionId(ro));
@@ -270,7 +270,7 @@ public class FilesHelper {
     }
 
 
-    public ResourceInfo getFileInfo(DigitalPublication ro, String filePath)
+    public ResourceMetadata getFileInfo(DigitalPublication ro, String filePath)
             throws RemoteException, IdNotFoundException, AccessDeniedException, DLibraException {
         VersionId versionId = getVersionId(ro, filePath);
         VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(new InputFilter(versionId),
@@ -281,14 +281,14 @@ public class FilesHelper {
     }
 
 
-    private ResourceInfo createResourceInfo(VersionInfo versionInfo, String filePath, String mimeType)
+    private ResourceMetadata createResourceInfo(VersionInfo versionInfo, String filePath, String mimeType)
             throws RemoteException, IdNotFoundException, AccessDeniedException, DLibraException {
         String name = filePath.substring(filePath.lastIndexOf('/') + 1);
         byte[] fileDigest = contentServer.getFileDigest(versionInfo.getId());
         String digest = getHex(fileDigest);
         long size = versionInfo.getSize();
         DateTime lastModified = new DateTime(versionInfo.getLastModificationDate());
-        return ResourceInfo.create(filePath, name, digest, size, "MD5", lastModified, mimeType);
+        return new ResourceMetadata(filePath, name, digest, size, "MD5", lastModified, mimeType);
     }
 
 

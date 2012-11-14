@@ -13,15 +13,15 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 
-import pl.psnc.dl.wf4ever.common.ResourceInfo;
-import pl.psnc.dl.wf4ever.common.UserProfile;
-import pl.psnc.dl.wf4ever.common.UserProfile.Role;
 import pl.psnc.dl.wf4ever.dl.AccessDeniedException;
 import pl.psnc.dl.wf4ever.dl.ConflictException;
 import pl.psnc.dl.wf4ever.dl.DigitalLibrary;
 import pl.psnc.dl.wf4ever.dl.DigitalLibraryException;
 import pl.psnc.dl.wf4ever.dl.DigitalPublication;
 import pl.psnc.dl.wf4ever.dl.NotFoundException;
+import pl.psnc.dl.wf4ever.dl.ResourceMetadata;
+import pl.psnc.dl.wf4ever.dl.UserMetadata;
+import pl.psnc.dl.wf4ever.dl.UserMetadata.Role;
 import pl.psnc.dlibra.content.ContentServer;
 import pl.psnc.dlibra.metadata.AbstractPublicationInfo;
 import pl.psnc.dlibra.metadata.DirectoryId;
@@ -174,15 +174,33 @@ public class DLibraDataSource implements DigitalLibrary {
     }
 
 
-    @Override
-    public UserProfile getUserProfile()
+    /**
+     * Get the profile of the user that is logged in to dLibra.
+     * 
+     * @return user profile
+     * @throws NotFoundException
+     *             user profile not found
+     * @throws DigitalLibraryException
+     *             dLibra exception
+     */
+    public UserMetadata getUserProfile()
             throws DigitalLibraryException, NotFoundException {
         return getUserProfile(userLogin);
     }
 
 
-    @Override
-    public UserProfile getUserProfile(String login)
+    /**
+     * Get the profile of a user.
+     * 
+     * @param login
+     *            user login
+     * @return user profile
+     * @throws NotFoundException
+     *             user profile not found
+     * @throws DigitalLibraryException
+     *             dLibra exception
+     */
+    public UserMetadata getUserProfile(String login)
             throws DigitalLibraryException, NotFoundException {
         User user;
         try {
@@ -193,7 +211,7 @@ public class DLibraDataSource implements DigitalLibrary {
             throw new DigitalLibraryException(e);
         }
         // FIXME should be based on sth else than login
-        UserProfile.Role role;
+        UserMetadata.Role role;
         if (login.equals("wfadmin")) {
             role = Role.ADMIN;
         } else if (login.equals("wf4ever_reader")) {
@@ -201,7 +219,7 @@ public class DLibraDataSource implements DigitalLibrary {
         } else {
             role = Role.AUTHENTICATED;
         }
-        return UserProfile.create(user.getLogin(), user.getName(), role);
+        return new UserMetadata(user.getLogin(), user.getName(), role);
     }
 
 
@@ -245,7 +263,8 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public ResourceInfo createOrUpdateFile(DigitalPublication ro, String filePath, InputStream inputStream, String type)
+    public ResourceMetadata createOrUpdateFile(DigitalPublication ro, String filePath, InputStream inputStream,
+            String type)
             throws DigitalLibraryException, NotFoundException, AccessDeniedException {
         try {
             return filesHelper.createOrUpdateFile(ro, filePath, inputStream, type);
@@ -260,7 +279,7 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public ResourceInfo getFileInfo(DigitalPublication ro, String filePath)
+    public ResourceMetadata getFileInfo(DigitalPublication ro, String filePath)
             throws NotFoundException, DigitalLibraryException, AccessDeniedException {
         try {
             return filesHelper.getFileInfo(ro, filePath);

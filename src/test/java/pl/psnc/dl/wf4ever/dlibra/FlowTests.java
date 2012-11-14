@@ -21,14 +21,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import pl.psnc.dl.wf4ever.common.HibernateUtil;
-import pl.psnc.dl.wf4ever.common.ResearchObject;
-import pl.psnc.dl.wf4ever.common.ResourceInfo;
 import pl.psnc.dl.wf4ever.dl.AccessDeniedException;
 import pl.psnc.dl.wf4ever.dl.ConflictException;
 import pl.psnc.dl.wf4ever.dl.DigitalLibrary;
 import pl.psnc.dl.wf4ever.dl.DigitalLibraryException;
 import pl.psnc.dl.wf4ever.dl.NotFoundException;
+import pl.psnc.dl.wf4ever.dl.ResourceMetadata;
 import pl.psnc.dl.wf4ever.dlibra.helpers.DLibraDataSource;
 
 /**
@@ -106,22 +104,19 @@ public class FlowTests {
     @Before
     public void setUp()
             throws Exception {
-        HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         userId = "test-" + new Date().getTime();
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.createUser(userId, USER_PASSWORD, USERNAME);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
-        ro = ResearchObject.findByUri(RO_URI);
+        ro = new ResearchObject(RO_URI);
         if (ro != null) {
             try {
                 dl.deleteResearchObject(ro);
             } catch (NotFoundException e) {
                 //nothing
             }
-            ro.delete();
-            HibernateUtil.getSessionFactory().getCurrentSession().flush();
         }
-        ro = ResearchObject.create(RO_URI);
+        ro = new ResearchObject(RO_URI);
         dl.createResearchObject(ro, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
 
@@ -140,7 +135,6 @@ public class FlowTests {
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
         dl.deleteUser(userId);
-        HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
     }
 
 
@@ -239,7 +233,7 @@ public class FlowTests {
     private void createOrUpdateFile(FileRecord file)
             throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException {
         InputStream f = file.open();
-        ResourceInfo r1 = dl.createOrUpdateFile(ro, file.path, f, file.mimeType);
+        ResourceMetadata r1 = dl.createOrUpdateFile(ro, file.path, f, file.mimeType);
         f.close();
         assertNotNull(r1);
     }
@@ -262,7 +256,7 @@ public class FlowTests {
 
     private void createOrUpdateDirectory(String path)
             throws DigitalLibraryException, IOException, NotFoundException, AccessDeniedException {
-        ResourceInfo r1 = dl.createOrUpdateFile(ro, path, new ByteArrayInputStream(new byte[0]), "text/plain");
+        ResourceMetadata r1 = dl.createOrUpdateFile(ro, path, new ByteArrayInputStream(new byte[0]), "text/plain");
         assertNotNull(r1);
     }
 
