@@ -19,7 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
-import pl.psnc.dl.wf4ever.dl.DigitalPublication;
+import pl.psnc.dl.wf4ever.dlibra.hibernate.ResearchObject;
 import pl.psnc.dlibra.common.Info;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -211,7 +211,7 @@ public class PublicationsHelper {
     }
 
 
-    public void publishPublication(DigitalPublication ro)
+    public void publishPublication(ResearchObject ro)
             throws RemoteException, DLibraException {
         LOGGER.debug(String.format("%s\t\tpublish start", new DateTime().toString()));
 
@@ -270,7 +270,7 @@ public class PublicationsHelper {
      * @throws DLibraException
      * @throws IOException
      */
-    public void deleteVersionPublication(DigitalPublication ro)
+    public void deleteVersionPublication(ResearchObject ro)
             throws DLibraException, IOException {
         PublicationId publicationId = new PublicationId(dLibra.getDlROVersionId(ro));
         publicationManager.removePublication(publicationId, true, "Research Object Version removed.");

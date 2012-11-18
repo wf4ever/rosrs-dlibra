@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import pl.psnc.dl.wf4ever.dl.DigitalPublication;
+import pl.psnc.dl.wf4ever.dlibra.hibernate.ResearchObject;
 import pl.psnc.dlibra.common.CollectionResult;
 import pl.psnc.dlibra.common.DLObject;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -54,7 +54,7 @@ public class AttributesHelper {
     }
 
 
-    public void storeAttributes(DigitalPublication ro, Multimap<URI, Object> attributes)
+    public void storeAttributes(ResearchObject ro, Multimap<URI, Object> attributes)
             throws RemoteException, IdNotFoundException, DLibraException {
         if (logger.isDebugEnabled()) {
             for (Entry<URI, Object> entry : attributes.entries()) {
@@ -69,7 +69,7 @@ public class AttributesHelper {
     }
 
 
-    private AttributeValueSet getAttributeValueSet(DigitalPublication ro)
+    private AttributeValueSet getAttributeValueSet(ResearchObject ro)
             throws RemoteException, DLibraException, IdNotFoundException {
         EditionId editionId = new EditionId(dl.getDlEditionId(ro));
 

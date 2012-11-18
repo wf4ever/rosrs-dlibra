@@ -21,8 +21,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
-import pl.psnc.dl.wf4ever.dl.DigitalPublication;
 import pl.psnc.dl.wf4ever.dl.ResourceMetadata;
+import pl.psnc.dl.wf4ever.dlibra.hibernate.ResearchObject;
 import pl.psnc.dlibra.common.Id;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -75,7 +75,7 @@ public class FilesHelper {
      * @throws RemoteException
      * @throws DLibraException
      */
-    public List<String> getFilePathsInFolder(DigitalPublication ro, String folder)
+    public List<String> getFilePathsInFolder(ResearchObject ro, String folder)
             throws RemoteException, DLibraException {
         ArrayList<String> result = new ArrayList<String>();
         for (FileInfo fileInfo : getFilesInFolder(ro, folder).values()) {
@@ -98,7 +98,7 @@ public class FilesHelper {
      * @throws RemoteException
      * @throws DLibraException
      */
-    private Map<VersionId, FileInfo> getFilesInFolder(DigitalPublication ro, String folder)
+    private Map<VersionId, FileInfo> getFilesInFolder(ResearchObject ro, String folder)
             throws RemoteException, DLibraException {
         Map<VersionId, FileInfo> result = new HashMap<VersionId, FileInfo>();
         if (folder != null && !folder.endsWith("/"))
@@ -143,7 +143,7 @@ public class FilesHelper {
      * @throws RemoteException
      * @throws DLibraException
      */
-    public InputStream getZippedFolder(final DigitalPublication ro, String folderNotStandardized)
+    public InputStream getZippedFolder(final ResearchObject ro, String folderNotStandardized)
             throws RemoteException, DLibraException {
         final String folder = (folderNotStandardized == null ? null
                 : (folderNotStandardized.endsWith("/") ? folderNotStandardized : folderNotStandardized.concat("/")));
@@ -205,7 +205,7 @@ public class FilesHelper {
     }
 
 
-    public InputStream getFileContents(DigitalPublication ro, String filePath)
+    public InputStream getFileContents(ResearchObject ro, String filePath)
             throws IdNotFoundException, RemoteException, DLibraException {
         VersionId versionId = getVersionId(ro, filePath);
 
@@ -217,7 +217,7 @@ public class FilesHelper {
     }
 
 
-    public boolean fileExists(DigitalPublication ro, String filePath)
+    public boolean fileExists(ResearchObject ro, String filePath)
             throws IdNotFoundException, RemoteException, DLibraException {
         return getVersionId(ro, filePath) != null;
     }
@@ -239,7 +239,7 @@ public class FilesHelper {
     }
 
 
-    public ResourceMetadata createOrUpdateFile(DigitalPublication ro, String filePath, InputStream inputStream,
+    public ResourceMetadata createOrUpdateFile(ResearchObject ro, String filePath, InputStream inputStream,
             String mimeType)
             throws IOException, DLibraException, TransformerException {
         PublicationId roVersionId = new PublicationId(dLibra.getDlROVersionId(ro));
@@ -270,7 +270,7 @@ public class FilesHelper {
     }
 
 
-    public ResourceMetadata getFileInfo(DigitalPublication ro, String filePath)
+    public ResourceMetadata getFileInfo(ResearchObject ro, String filePath)
             throws RemoteException, IdNotFoundException, AccessDeniedException, DLibraException {
         VersionId versionId = getVersionId(ro, filePath);
         VersionInfo versionInfo = (VersionInfo) fileManager.getObjects(new InputFilter(versionId),
@@ -300,7 +300,7 @@ public class FilesHelper {
      * @throws IOException
      * @throws TransformerException
      */
-    private void deleteUnnecessaryEmptyFolders(DigitalPublication ro, String filePath)
+    private void deleteUnnecessaryEmptyFolders(ResearchObject ro, String filePath)
             throws DLibraException, IOException, TransformerException {
         String intermediateFilePath = filePath;
         while (intermediateFilePath.lastIndexOf("/") > 0) {
@@ -321,7 +321,7 @@ public class FilesHelper {
      * @throws RemoteException
      * @throws DLibraException
      */
-    public VersionId getVersionIdSafe(DigitalPublication ro, String filePath)
+    public VersionId getVersionIdSafe(ResearchObject ro, String filePath)
             throws RemoteException, DLibraException {
         try {
             return getVersionId(ro, filePath);
@@ -375,7 +375,7 @@ public class FilesHelper {
     }
 
 
-    public void deleteFile(DigitalPublication ro, String filePath)
+    public void deleteFile(ResearchObject ro, String filePath)
             throws DLibraException, IOException, TransformerException {
         EditionId editionId = new EditionId(dLibra.getDlEditionId(ro));
 
@@ -426,7 +426,7 @@ public class FilesHelper {
     }
 
 
-    public VersionId getVersionId(DigitalPublication ro, String filePath)
+    public VersionId getVersionId(ResearchObject ro, String filePath)
             throws IdNotFoundException, RemoteException, DLibraException {
         VersionId versionId = (VersionId) fileManager.getObjects(
             new FileFilter().setEditionId(new EditionId(dLibra.getDlEditionId(ro))).setFileName("/" + filePath),

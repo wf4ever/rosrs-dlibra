@@ -17,11 +17,12 @@ import pl.psnc.dl.wf4ever.dl.AccessDeniedException;
 import pl.psnc.dl.wf4ever.dl.ConflictException;
 import pl.psnc.dl.wf4ever.dl.DigitalLibrary;
 import pl.psnc.dl.wf4ever.dl.DigitalLibraryException;
-import pl.psnc.dl.wf4ever.dl.DigitalPublication;
 import pl.psnc.dl.wf4ever.dl.NotFoundException;
 import pl.psnc.dl.wf4ever.dl.ResourceMetadata;
 import pl.psnc.dl.wf4ever.dl.UserMetadata;
 import pl.psnc.dl.wf4ever.dl.UserMetadata.Role;
+import pl.psnc.dl.wf4ever.dlibra.hibernate.HibernateUtil;
+import pl.psnc.dl.wf4ever.dlibra.hibernate.ResearchObject;
 import pl.psnc.dlibra.content.ContentServer;
 import pl.psnc.dlibra.metadata.AbstractPublicationInfo;
 import pl.psnc.dlibra.metadata.DirectoryId;
@@ -224,9 +225,12 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public InputStream getZippedFolder(DigitalPublication ro, String folder)
+    public InputStream getZippedFolder(URI uri, String folder)
             throws DigitalLibraryException, NotFoundException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+            ResearchObject ro = ResearchObject.create(uri);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             return filesHelper.getZippedFolder(ro, folder);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
@@ -237,9 +241,12 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public InputStream getFileContents(DigitalPublication ro, String filePath)
+    public InputStream getFileContents(URI uri, String filePath)
             throws DigitalLibraryException, NotFoundException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+            ResearchObject ro = ResearchObject.create(uri);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             return filesHelper.getFileContents(ro, filePath);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
@@ -250,9 +257,12 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public boolean fileExists(DigitalPublication ro, String filePath)
+    public boolean fileExists(URI uri, String filePath)
             throws DigitalLibraryException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+            ResearchObject ro = ResearchObject.create(uri);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             return filesHelper.fileExists(ro, filePath);
         } catch (IdNotFoundException e) {
             return false;
@@ -263,10 +273,12 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public ResourceMetadata createOrUpdateFile(DigitalPublication ro, String filePath, InputStream inputStream,
-            String type)
+    public ResourceMetadata createOrUpdateFile(URI uri, String filePath, InputStream inputStream, String type)
             throws DigitalLibraryException, NotFoundException, AccessDeniedException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+            ResearchObject ro = ResearchObject.create(uri);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             return filesHelper.createOrUpdateFile(ro, filePath, inputStream, type);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
@@ -279,9 +291,12 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public ResourceMetadata getFileInfo(DigitalPublication ro, String filePath)
+    public ResourceMetadata getFileInfo(URI uri, String filePath)
             throws NotFoundException, DigitalLibraryException, AccessDeniedException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+            ResearchObject ro = ResearchObject.create(uri);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             return filesHelper.getFileInfo(ro, filePath);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
@@ -294,9 +309,12 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public void deleteFile(DigitalPublication ro, String filePath)
+    public void deleteFile(URI uri, String filePath)
             throws DigitalLibraryException, NotFoundException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+            ResearchObject ro = ResearchObject.create(uri);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             filesHelper.deleteFile(ro, filePath);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
@@ -307,22 +325,24 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public void createResearchObject(DigitalPublication ro, InputStream mainFileContent, String mainFilePath,
-            String mainFileMimeType)
+    public void createResearchObject(URI uri, InputStream mainFileContent, String mainFilePath, String mainFileMimeType)
             throws DigitalLibraryException, ConflictException, AccessDeniedException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+            ResearchObject ro = ResearchObject.create(uri);
             createWorkspaceGroupPublication(ro);
             createRoGroupPublication(ro);
             createVersionPublication(ro);
             createEdition(ro, mainFileContent, mainFilePath, mainFileMimeType);
             publicationsHelper.publishPublication(ro);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
         } catch (IOException | DLibraException | TransformerException e) {
             throw new DigitalLibraryException(e);
         }
     }
 
 
-    private void createEdition(DigitalPublication ro, InputStream mainFileContent, String mainFilePath,
+    private void createEdition(ResearchObject ro, InputStream mainFileContent, String mainFilePath,
             String mainFileMimeType)
             throws AccessDeniedException, IdNotFoundException, RemoteException, DLibraException, TransformerException,
             IOException {
@@ -332,7 +352,7 @@ public class DLibraDataSource implements DigitalLibrary {
     }
 
 
-    private void createVersionPublication(DigitalPublication ro)
+    private void createVersionPublication(ResearchObject ro)
             throws RemoteException, DLibraException, IOException, TransformerException, ConflictException {
         if (getDlROVersionId(ro) == 0) {
             PublicationId verId = publicationsHelper.createVersionPublication(new PublicationId(getDlROId(ro)), "v1");
@@ -343,7 +363,7 @@ public class DLibraDataSource implements DigitalLibrary {
     }
 
 
-    private void createRoGroupPublication(DigitalPublication ro)
+    private void createRoGroupPublication(ResearchObject ro)
             throws RemoteException, DLibraException {
         if (getDlROId(ro) == 0) {
             PublicationId roId = publicationsHelper.createROGroupPublication(new PublicationId(ro.getDlWorkspaceId()),
@@ -353,7 +373,7 @@ public class DLibraDataSource implements DigitalLibrary {
     }
 
 
-    private void createWorkspaceGroupPublication(DigitalPublication ro)
+    private void createWorkspaceGroupPublication(ResearchObject ro)
             throws RemoteException, DLibraException, IdNotFoundException, AccessDeniedException,
             UnavailableServiceException {
         if (getDlWorkspaceId(ro) == 0) {
@@ -373,7 +393,7 @@ public class DLibraDataSource implements DigitalLibrary {
      * @throws DLibraException
      * @throws RemoteException
      */
-    long getDlWorkspaceId(DigitalPublication ro)
+    long getDlWorkspaceId(ResearchObject ro)
             throws RemoteException, DLibraException {
         if (ro.getDlWorkspaceId() == 0) {
             PublicationId publicationId = publicationsHelper.getGroupId("default");
@@ -392,7 +412,7 @@ public class DLibraDataSource implements DigitalLibrary {
      * @throws DLibraException
      * @throws RemoteException
      */
-    long getDlROId(DigitalPublication ro)
+    long getDlROId(ResearchObject ro)
             throws RemoteException, DLibraException {
         if (ro.getDlROId() == 0) {
             PublicationId publicationId = publicationsHelper.getPublicationId(new PublicationId(getDlWorkspaceId(ro)),
@@ -412,7 +432,7 @@ public class DLibraDataSource implements DigitalLibrary {
      * @throws DLibraException
      * @throws RemoteException
      */
-    long getDlROVersionId(DigitalPublication ro)
+    long getDlROVersionId(ResearchObject ro)
             throws RemoteException, DLibraException {
         if (ro.getDlROVersionId() == 0) {
             PublicationId roId = new PublicationId(getDlROId(ro));
@@ -432,7 +452,7 @@ public class DLibraDataSource implements DigitalLibrary {
      * @throws DLibraException
      * @throws RemoteException
      */
-    long getDlEditionId(DigitalPublication ro)
+    long getDlEditionId(ResearchObject ro)
             throws RemoteException, DLibraException {
         if (ro.getDlEditionId() == 0) {
             long versionIdLong = getDlROVersionId(ro);
@@ -444,9 +464,11 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public void deleteResearchObject(DigitalPublication ro)
+    public void deleteResearchObject(URI uri)
             throws DigitalLibraryException, NotFoundException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+            ResearchObject ro = ResearchObject.create(uri);
             publicationsHelper.deleteVersionPublication(ro);
             List<PublicationInfo> vers = publicationsHelper.listPublicationsInROGroupPublication(new PublicationId(ro
                     .getDlROVersionId()));
@@ -457,6 +479,8 @@ public class DLibraDataSource implements DigitalLibrary {
                     publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlWorkspaceId()));
                 }
             }
+            ro.delete();
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
         } catch (IOException | DLibraException e) {
@@ -502,9 +526,10 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public InputStream getZippedResearchObject(DigitalPublication ro)
+    public InputStream getZippedResearchObject(URI uri)
             throws DigitalLibraryException, NotFoundException {
         try {
+            ResearchObject ro = ResearchObject.create(uri);
             return filesHelper.getZippedFolder(ro, null);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
@@ -515,9 +540,10 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public void storeAttributes(DigitalPublication ro, Multimap<URI, Object> roAttributes)
+    public void storeAttributes(URI uri, Multimap<URI, Object> roAttributes)
             throws NotFoundException, DigitalLibraryException {
         try {
+            ResearchObject ro = ResearchObject.create(uri);
             attributesHelper.storeAttributes(ro, roAttributes);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
@@ -528,7 +554,7 @@ public class DLibraDataSource implements DigitalLibrary {
     }
 
 
-    private static String getRoId(DigitalPublication ro) {
+    private static String getRoId(ResearchObject ro) {
         if (ro.getUri().getPath() == null) {
             return null;
         }

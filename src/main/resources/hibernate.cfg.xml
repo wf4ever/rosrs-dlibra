@@ -31,9 +31,7 @@
 		<!-- Drop and re-create the database schema on startup -->
 		<property name="hbm2ddl.auto">create</property>
 
-		<mapping class="pl.psnc.dl.wf4ever.common.ResearchObject" />
-		<mapping class="pl.psnc.dl.wf4ever.common.UserProfile" />
-		<mapping class="pl.psnc.dl.wf4ever.common.ResourceInfo" />
+		<mapping class="pl.psnc.dl.wf4ever.dlibra.hibernate.ResearchObject" />
 
 
 	</session-factory>
