@@ -337,7 +337,11 @@ public class DLibraDataSource implements DigitalLibrary {
             publicationsHelper.publishPublication(ro);
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
         } catch (IOException | DLibraException | TransformerException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
     }
 
@@ -354,17 +358,21 @@ public class DLibraDataSource implements DigitalLibrary {
 
     private void createVersionPublication(ResearchObject ro)
             throws RemoteException, DLibraException, IOException, TransformerException, ConflictException {
-        if (getDlROVersionId(ro) == 0) {
-            PublicationId verId = publicationsHelper.createVersionPublication(new PublicationId(getDlROId(ro)), "v1");
-            ro.setDlROVersionId(verId.getId());
-        } else {
+        if (getDlROVersionId(ro) != 0 && publicationsHelper.publicationExists(new PublicationId(getDlROVersionId(ro)))) {
             throw new ConflictException(ro.getUri().toString());
         }
+        PublicationId verId = publicationsHelper.createVersionPublication(new PublicationId(getDlROId(ro)), "v1");
+        ro.setDlROVersionId(verId.getId());
     }
 
 
     private void createRoGroupPublication(ResearchObject ro)
             throws RemoteException, DLibraException {
+        if (getDlROId(ro) != 0 && !publicationsHelper.publicationExists(new PublicationId(getDlROId(ro)))) {
+            ro.setDlROId(0);
+            ro.setDlROVersionId(0);
+            ro.setDlEditionId(0);
+        }
         if (getDlROId(ro) == 0) {
             PublicationId roId = publicationsHelper.createROGroupPublication(new PublicationId(ro.getDlWorkspaceId()),
                 getRoId(ro));
@@ -376,6 +384,12 @@ public class DLibraDataSource implements DigitalLibrary {
     private void createWorkspaceGroupPublication(ResearchObject ro)
             throws RemoteException, DLibraException, IdNotFoundException, AccessDeniedException,
             UnavailableServiceException {
+        if (getDlWorkspaceId(ro) != 0 && !publicationsHelper.publicationExists(new PublicationId(getDlWorkspaceId(ro)))) {
+            ro.setDlWorkspaceId(0);
+            ro.setDlROId(0);
+            ro.setDlROVersionId(0);
+            ro.setDlEditionId(0);
+        }
         if (getDlWorkspaceId(ro) == 0) {
             PublicationId workspaceId = publicationsHelper.createWorkspaceGroupPublication("default");
             usersHelper.grantReadAccessToPublication(workspaceId);
@@ -469,9 +483,10 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            ro.delete();
             publicationsHelper.deleteVersionPublication(ro);
             List<PublicationInfo> vers = publicationsHelper.listPublicationsInROGroupPublication(new PublicationId(ro
-                    .getDlROVersionId()));
+                    .getDlROId()));
             if (vers.isEmpty()) {
                 publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlROId()));
                 List<AbstractPublicationInfo> ros = publicationsHelper.listROGroupPublications();
@@ -479,12 +494,15 @@ public class DLibraDataSource implements DigitalLibrary {
                     publicationsHelper.deleteGroupPublication(new PublicationId(ro.getDlWorkspaceId()));
                 }
             }
-            ro.delete();
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             throw new NotFoundException("Something was not found", e);
         } catch (IOException | DLibraException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
         }
 
     }
@@ -529,7 +547,9 @@ public class DLibraDataSource implements DigitalLibrary {
     public InputStream getZippedResearchObject(URI uri)
             throws DigitalLibraryException, NotFoundException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             return filesHelper.getZippedFolder(ro, null);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);
@@ -543,7 +563,9 @@ public class DLibraDataSource implements DigitalLibrary {
     public void storeAttributes(URI uri, Multimap<URI, Object> roAttributes)
             throws NotFoundException, DigitalLibraryException {
         try {
+            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             attributesHelper.storeAttributes(ro, roAttributes);
         } catch (IdNotFoundException e) {
             throw new NotFoundException("Something was not found", e);

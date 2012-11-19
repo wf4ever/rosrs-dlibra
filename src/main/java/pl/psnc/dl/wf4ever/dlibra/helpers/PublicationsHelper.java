@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import pl.psnc.dl.wf4ever.dlibra.hibernate.ResearchObject;
+import pl.psnc.dlibra.common.CollectionResult;
 import pl.psnc.dlibra.common.Info;
 import pl.psnc.dlibra.common.InputFilter;
 import pl.psnc.dlibra.common.OutputFilter;
@@ -274,6 +275,16 @@ public class PublicationsHelper {
             throws DLibraException, IOException {
         PublicationId publicationId = new PublicationId(dLibra.getDlROVersionId(ro));
         publicationManager.removePublication(publicationId, true, "Research Object Version removed.");
+    }
+
+
+    public boolean publicationExists(PublicationId publicationId)
+            throws UnsupportedOperationException, IdNotFoundException, RemoteException, DLibraException {
+        CollectionResult resultInfos = publicationManager.getObjects(
+            new PublicationFilter(publicationId).setGroupStatus(Publication.PUB_GROUP_ALL).setPublicationState(
+                (byte) (Publication.PUB_STATE_ALL - Publication.PUB_STATE_PERMANENT_DELETED)), new OutputFilter(
+                    AbstractPublicationInfo.class));
+        return resultInfos.getResultsCount() > 0;
     }
 
 
