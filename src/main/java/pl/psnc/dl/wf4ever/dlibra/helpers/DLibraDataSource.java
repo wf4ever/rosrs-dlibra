@@ -227,15 +227,21 @@ public class DLibraDataSource implements DigitalLibrary {
     @Override
     public InputStream getZippedFolder(URI uri, String folder)
             throws DigitalLibraryException, NotFoundException {
+        HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         try {
-            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            InputStream result = filesHelper.getZippedFolder(ro, folder);
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
-            return filesHelper.getZippedFolder(ro, folder);
+            return result;
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
     }
 
@@ -246,12 +252,18 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            InputStream result = filesHelper.getFileContents(ro, filePath);
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
-            return filesHelper.getFileContents(ro, filePath);
+            return result;
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
     }
 
@@ -262,12 +274,18 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            boolean result = filesHelper.fileExists(ro, filePath);
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
-            return filesHelper.fileExists(ro, filePath);
+            return result;
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             return false;
         } catch (RemoteException | DLibraException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
     }
 
@@ -278,14 +296,21 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            ResourceMetadata result = filesHelper.createOrUpdateFile(ro, filePath, inputStream, type);
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
-            return filesHelper.createOrUpdateFile(ro, filePath, inputStream, type);
+            return result;
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new NotFoundException("Something was not found", e);
         } catch (pl.psnc.dlibra.service.AccessDeniedException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new AccessDeniedException(e.getMessage(), e);
         } catch (IOException | DLibraException | TransformerException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
     }
 
@@ -296,14 +321,21 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            ResourceMetadata result = filesHelper.getFileInfo(ro, filePath);
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
-            return filesHelper.getFileInfo(ro, filePath);
+            return result;
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new NotFoundException("Something was not found", e);
         } catch (pl.psnc.dlibra.service.AccessDeniedException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new AccessDeniedException(e.getMessage(), e);
         } catch (IOException | DLibraException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
     }
 
@@ -314,12 +346,17 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
-            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             filesHelper.deleteFile(ro, filePath);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new NotFoundException("Something was not found", e);
         } catch (IOException | DLibraException | TransformerException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
     }
 
@@ -503,6 +540,7 @@ public class DLibraDataSource implements DigitalLibrary {
             throw new DigitalLibraryException(e);
         } catch (Throwable e) {
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
 
     }
@@ -549,12 +587,18 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
+            InputStream result = filesHelper.getZippedFolder(ro, null);
             HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
-            return filesHelper.getZippedFolder(ro, null);
+            return result;
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
     }
 
@@ -565,12 +609,17 @@ public class DLibraDataSource implements DigitalLibrary {
         try {
             HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
             ResearchObject ro = ResearchObject.create(uri);
-            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
             attributesHelper.storeAttributes(ro, roAttributes);
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().commit();
         } catch (IdNotFoundException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new NotFoundException("Something was not found", e);
         } catch (RemoteException | DLibraException e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
             throw new DigitalLibraryException(e);
+        } catch (Throwable e) {
+            HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
+            throw e;
         }
 
     }
