@@ -547,10 +547,10 @@ public class DLibraDataSource implements DigitalLibrary {
 
 
     @Override
-    public boolean createUser(String userId, String password, String username)
+    public boolean createOrUpdateUser(String userId, String password, String username)
             throws DigitalLibraryException {
         try {
-            return usersHelper.createUser(userId, password, username);
+            return usersHelper.createOrUpdateUser(userId, password, username);
         } catch (RemoteException | DLibraException e) {
             throw new DigitalLibraryException(e);
         }

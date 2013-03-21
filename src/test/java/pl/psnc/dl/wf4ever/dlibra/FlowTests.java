@@ -104,7 +104,7 @@ public class FlowTests {
             throws Exception {
         userId = "test-" + new Date().getTime();
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID, ADMIN_PASSWORD);
-        dl.createUser(userId, USER_PASSWORD, USERNAME);
+        dl.createOrUpdateUser(userId, USER_PASSWORD, USERNAME);
         dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, userId, USER_PASSWORD);
         try {
             dl.deleteResearchObject(RO_URI);

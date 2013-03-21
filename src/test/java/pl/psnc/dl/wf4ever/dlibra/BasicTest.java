@@ -117,7 +117,7 @@ public class BasicTest {
             throws DigitalLibraryException, NotFoundException, ConflictException, IOException, AccessDeniedException {
         DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
-        assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
+        assertTrue(dlA.createOrUpdateUser(USER_ID, USER_PASSWORD, USERNAME));
         DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
         dl.createResearchObject(RO_URI, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
@@ -136,8 +136,8 @@ public class BasicTest {
             throws DigitalLibraryException, IOException, NotFoundException {
         DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
-        assertTrue(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
-        assertFalse(dlA.createUser(USER_ID, USER_PASSWORD, USERNAME));
+        assertTrue(dlA.createOrUpdateUser(USER_ID, USER_PASSWORD, USERNAME));
+        assertFalse(dlA.createOrUpdateUser(USER_ID, USER_PASSWORD, USERNAME));
         DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
         UserMetadata user = ((DLibraDataSource) dl).getUserProfile();
         Assert.assertEquals("User login is equal", USER_ID, user.getLogin());
@@ -150,7 +150,7 @@ public class BasicTest {
             throws DigitalLibraryException, IOException, ConflictException, AccessDeniedException {
         DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
-        dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
+        dlA.createOrUpdateUser(USER_ID, USER_PASSWORD, USERNAME);
         DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
         dl.createResearchObject(RO_URI, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);
@@ -171,7 +171,7 @@ public class BasicTest {
             throws DigitalLibraryException, IOException, ConflictException, NotFoundException, AccessDeniedException {
         DigitalLibrary dlA = new DLibraDataSource(host, port, workspacesDirectory, collectionId, ADMIN_ID,
                 ADMIN_PASSWORD);
-        dlA.createUser(USER_ID, USER_PASSWORD, USERNAME);
+        dlA.createOrUpdateUser(USER_ID, USER_PASSWORD, USERNAME);
         DigitalLibrary dl = new DLibraDataSource(host, port, workspacesDirectory, collectionId, USER_ID, USER_PASSWORD);
         dl.createResearchObject(RO_URI, new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes()), MAIN_FILE_PATH,
             MAIN_FILE_MIME_TYPE);

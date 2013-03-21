@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 
+import pl.psnc.dl.wf4ever.dlibra.hibernate.ResearchObject;
 import pl.psnc.dlibra.metadata.Directory;
 import pl.psnc.dlibra.metadata.DirectoryId;
 import pl.psnc.dlibra.metadata.DirectoryManager;
@@ -66,7 +67,7 @@ public class UsersHelper {
      * @throws RemoteException
      * @throws DLibraException
      */
-    public boolean createUser(String login, String password, String username)
+    public boolean createOrUpdateUser(String login, String password, String username)
             throws RemoteException, DLibraException {
         // check if user already exists
         boolean created;
